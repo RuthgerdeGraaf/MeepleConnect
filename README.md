@@ -1,6 +1,6 @@
 # MeepleConnect - Web API for Boardgames
 
-[Here](https://github.com/RuthgerdeGraaf?tab=repositories) you can find the GitHub repository.
+[Here](https://github.com/RuthgerdeGraaf/MeepleConnect) you can find the GitHub repository.
 
 ## Table of contents
 
