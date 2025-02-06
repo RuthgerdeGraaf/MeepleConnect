@@ -57,3 +57,4 @@ VALUES
         ('Twilight Imperium', 149.99, 1, true, 3, 6, 'Strategy', (SELECT id FROM publisher WHERE name = 'Fantasy Flight Games')),
         ('Carcassonne', 34.99, 8, true, 2, 5, 'Strategy', (SELECT id FROM publisher WHERE name = '999 Games')),
         ('Ticket to Ride', 49.99, 5, true, 2, 5, 'Strategy', (SELECT id FROM publisher WHERE name = 'Days of Wonder'));
+        
