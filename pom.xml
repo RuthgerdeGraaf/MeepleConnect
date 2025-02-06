@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.MeepleConnect</groupId>
     <artifactId>Boardgame-api</artifactId>
-    <version>0.0.1-alpha.1</version>
+    <version>0.1.1-alpha.1</version>
     <name>MeepleConnectBoardgamesAPI</name>
     <description>MeepleConnect Boardgames API - Level up your board game store with epic inventory and order management.</description>
     <url/>
