@@ -7,10 +7,10 @@ import javax.annotation.PostConstruct;
 import java.util.TimeZone;
 
 @SpringBootApplication
-public class MeepleConnectApplication {
+public class MeepleConnectBoardgamesApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MeepleConnectApplication.class, args);
+        SpringApplication.run(MeepleConnectBoardgamesApiApplication.class, args);
         System.out.println("🎲 MeepleConnect API is gestart en draait op http://localhost:8080/");
     }
 
