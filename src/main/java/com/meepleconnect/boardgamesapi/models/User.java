@@ -1,6 +1,7 @@
 package com.meepleconnect.boardgamesapi.models;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 public class User {
@@ -14,6 +15,9 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reservation> reservations;
 
     public User() {}
 
@@ -53,5 +57,13 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
 }
