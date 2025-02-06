@@ -1,49 +1,73 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
 import com.meepleconnect.boardgamesapi.models.Boardgame;
-import com.meepleconnect.boardgamesapi.services.BoardgameService;
+import com.meepleconnect.boardgamesapi.repositories.BoardgameRepository;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/boardgames")
+@RequestMapping("/api/boardgames")
 public class BoardgameController {
-    private final BoardgameService boardgameService;
 
-    public BoardgameController(BoardgameService boardgameService) {
-        this.boardgameService = boardgameService;
+    private final BoardgameRepository boardgameRepository;
+
+    public BoardgameController(BoardgameRepository boardgameRepository) {
+        this.boardgameRepository = boardgameRepository;
     }
 
     @GetMapping
-    public ResponseEntity<List<Boardgame>> getAllBoardgames() {
-        return ResponseEntity.ok(boardgameService.getAllBoardgames());
+    public List<Boardgame> getAllBoardgames() {
+        return boardgameRepository.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Boardgame> getBoardgameById(@PathVariable Long id) {
-        return ResponseEntity.ok(boardgameService.getBoardgameById(id));
+        Optional<Boardgame> boardgame = boardgameRepository.findById(id);
+        return boardgame.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @GetMapping("/genre/{genre}")
+    public List<Boardgame> getBoardgamesByGenre(@PathVariable String genre) {
+        return boardgameRepository.findByGenre(genre);
+    }
+
+    @GetMapping("/available")
+    public List<Boardgame> getAvailableBoardgames() {
+        return boardgameRepository.findByAvailableTrue();
+    }
+
     @PostMapping
-    public ResponseEntity<Boardgame> createBoardgame(@RequestBody Boardgame boardgame) {
-        return ResponseEntity.ok(boardgameService.createBoardgame(boardgame));
+    public ResponseEntity<Boardgame> addBoardgame(@RequestBody Boardgame boardgame) {
+        Boardgame savedGame = boardgameRepository.save(boardgame);
+        return ResponseEntity.ok(savedGame);
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE')")
     @PutMapping("/{id}")
-    public ResponseEntity<Boardgame> updateBoardgame(@PathVariable Long id, @RequestBody Boardgame boardgame) {
-        return ResponseEntity.ok(boardgameService.updateBoardgame(id, boardgame));
+    public ResponseEntity<Boardgame> updateBoardgame(@PathVariable Long id, @RequestBody Boardgame updatedGame) {
+        return boardgameRepository.findById(id).map(existingGame -> {
+            existingGame.setName(updatedGame.getName());
+            existingGame.setPrice(updatedGame.getPrice());
+            existingGame.setExpansions(updatedGame.getExpansions());
+            existingGame.setAvailable(updatedGame.isAvailable());
+            existingGame.setMinPlayers(updatedGame.getMinPlayers());
+            existingGame.setMaxPlayers(updatedGame.getMaxPlayers());
+            existingGame.setGenre(updatedGame.getGenre());
+            existingGame.setPublisher(updatedGame.getPublisher());
+
+            boardgameRepository.save(existingGame);
+            return ResponseEntity.ok(existingGame);
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBoardgame(@PathVariable Long id) {
-        boardgameService.deleteBoardgame(id);
-        return ResponseEntity.noContent().build();
+        if (boardgameRepository.existsById(id)) {
+            boardgameRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }
-
