@@ -1,10 +1,11 @@
 package com.meepleconnect.boardgamesapi.services;
 
+import com.meepleconnect.boardgamesapi.exceptions.BadRequestException;
+import com.meepleconnect.boardgamesapi.exceptions.ConflictException;
 import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
 import com.meepleconnect.boardgamesapi.models.Boardgame;
 import com.meepleconnect.boardgamesapi.repositories.BoardgameRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -21,12 +22,20 @@ public class BoardgameService {
         return boardgameRepository.findAll();
     }
 
+    public List<Boardgame> getBoardgamesByGenre(String genre) {
+        return boardgameRepository.findByGenreIgnoreCase(genre);
+    }
+
     public Boardgame getBoardgameById(Long id) {
         return boardgameRepository.findById(id)
                 .orElseThrow(() -> new GameNotFoundException("Bordspel met ID " + id + " niet gevonden."));
     }
 
     public Boardgame addBoardgame(Boardgame boardgame) {
+        Optional<Boardgame> existingBoardgame = boardgameRepository.findByNameIgnoreCase(boardgame.getName());
+        if (existingBoardgame.isPresent()) {
+            throw new ConflictException("Bordspel met de naam '" + boardgame.getName() + "' bestaat al.");
+        }
         return boardgameRepository.save(boardgame);
     }
 
@@ -45,7 +54,6 @@ public class BoardgameService {
         }).orElseThrow(() -> new GameNotFoundException("Bordspel met ID " + id + " niet gevonden."));
     }
 
-    // 🗑️ Bordspel verwijderen
     public void deleteBoardgame(Long id) {
         if (!boardgameRepository.existsById(id)) {
             throw new GameNotFoundException("Bordspel met ID " + id + " niet gevonden.");
