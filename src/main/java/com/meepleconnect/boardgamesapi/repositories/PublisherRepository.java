@@ -10,3 +10,4 @@ import java.util.List;
 public interface PublisherRepository extends JpaRepository<Publisher, Long> {
     List<Publisher> findByCountryOfOrigin(String countryOfOrigin);
     Publisher findByName(String name);
+}
