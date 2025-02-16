@@ -125,4 +125,14 @@ class BoardgameControllerIT {
         mockMvc.perform(delete("/api/boardgames/" + testGame.getId()))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    @WithMockUser
+    void getSpecialBoardgame_ShouldReturnTeapotException() throws Exception {
+        mockMvc.perform(get("/api/boardgames/418"))
+            .andExpect(status().isIAmATeapot()) 
+            .andExpect(jsonPath("$.error").value("I'm a teapot"))
+            .andExpect(jsonPath("$.message").value("Dit bordspel is een theepot!"));
+}
+
 }
