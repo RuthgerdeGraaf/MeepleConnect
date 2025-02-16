@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -51,7 +52,7 @@ class ReservationControllerIT {
         userRepository.deleteAll();
 
         testUser = new User("testUser", "password", null);
-        testGame = new Boardgame("Catan", 39.99, 2, true, 3, 4, "Strategy", null);
+        testGame = new Boardgame("Catan", BigDecimal.valueOf(39.99), 2, true, 3, 4, "Strategy", null);
         userRepository.save(testUser);
         boardgameRepository.save(testGame);
 
