@@ -8,7 +8,6 @@ public class Boardgame {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private double price;
     private int expansions;
@@ -18,19 +17,38 @@ public class Boardgame {
     private String genre;
 
     @ManyToOne
-    @JoinColumn(name = "publisher_id", nullable = false)
+    @JoinColumn(name = "publisher_id")
     private Publisher publisher;
 
-    public Boardgame() {}
+    public String getName() {
+        return name;
+    }
 
-    public Boardgame(String name, double price, int expansions, boolean available, int minPlayers, int maxPlayers, String genre, Publisher publisher) {
-        this.name = name;
-        this.price = price;
-        this.expansions = expansions;
-        this.available = available;
-        this.minPlayers = minPlayers;
-        this.maxPlayers = maxPlayers;
-        this.genre = genre;
-        this.publisher = publisher;
+    public double getPrice() {
+        return price;
+    }
+
+    public int getExpansions() {
+        return expansions;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public int getMinPlayers() {
+        return minPlayers;
+    }
+
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public Publisher getPublisher() {
+        return publisher;
     }
 }
