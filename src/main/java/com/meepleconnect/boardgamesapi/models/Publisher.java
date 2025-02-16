@@ -13,7 +13,6 @@ public class Publisher {
     private int founded;
     private boolean isIndie;
 
-    // ✅ Voeg ontbrekende GETTERS toe
     public String getName() {
         return name;
     }

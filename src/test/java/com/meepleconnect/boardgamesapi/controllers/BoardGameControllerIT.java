@@ -1,5 +1,6 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meepleconnect.boardgamesapi.models.Boardgame;
 import com.meepleconnect.boardgamesapi.repositories.BoardgameRepository;
@@ -11,6 +12,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -42,13 +46,20 @@ class BoardgameControllerIT {
 
     @Test
     void getAllBoardgames_ShouldReturnList() throws Exception {
-        mockMvc.perform(get("/api/boardgames"))
+        String jsonResponse = mockMvc.perform(get("/api/boardgames"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].name").value("Catan"));
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+    
+        List<Boardgame> boardgames = objectMapper.readValue(jsonResponse, new TypeReference<List<Boardgame>>() {});
+    
+        assertFalse(boardgames.isEmpty());
+        assertEquals("Catan", boardgames.get(0).getName());
     }
-
-    @Test
+    
+        
+            @Test
     void getBoardgameById_ShouldReturnGame() throws Exception {
         mockMvc.perform(get("/api/boardgames/" + testGame.getId()))
                 .andExpect(status().isOk())

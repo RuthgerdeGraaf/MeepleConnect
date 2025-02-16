@@ -17,6 +17,7 @@ class ExceptionControllerTest {
         exceptionController = new ExceptionController();
     }
 
+    @SuppressWarnings("null")
     @Test
     void handleGameNotFoundException_ShouldReturn404() {
         GameNotFoundException exception = new GameNotFoundException("Bordspel niet gevonden");
@@ -24,9 +25,11 @@ class ExceptionControllerTest {
         ResponseEntity<Object> response = exceptionController.handleGameNotFoundException(exception);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody(), "Response body should not be null");
         assertTrue(response.getBody().toString().contains("Bordspel niet gevonden"));
     }
 
+    @SuppressWarnings("null")
     @Test
     void handleGlobalException_ShouldReturn500() {
         Exception exception = new Exception("Onverwachte fout");
@@ -34,6 +37,7 @@ class ExceptionControllerTest {
         ResponseEntity<Object> response = exceptionController.handleGlobalException(exception);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNotNull(response.getBody(), "Response body should not be null");
         assertTrue(response.getBody().toString().contains("Onverwachte fout"));
     }
 }

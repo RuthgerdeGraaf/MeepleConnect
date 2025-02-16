@@ -1,7 +1,7 @@
 package com.meepleconnect.boardgamesapi.models;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;  // ✅ Importeer BigDecimal
+import java.math.BigDecimal;
 
 @Entity
 public class Boardgame {

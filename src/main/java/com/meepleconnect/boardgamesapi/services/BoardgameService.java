@@ -33,6 +33,10 @@ public class BoardgameService {
     }
 
     public Boardgame addBoardgame(Boardgame boardgame) {
+        if (boardgame.getName() == null || boardgame.getName().trim().isEmpty()) {
+            throw new BadRequestException("Naam van het bordspel mag niet leeg zijn.");
+        }
+        
         Optional<Boardgame> existingBoardgame = boardgameRepository.findByNameIgnoreCase(boardgame.getName());
         if (existingBoardgame.isPresent()) {
             throw new ConflictException("Bordspel met de naam '" + boardgame.getName() + "' bestaat al.");
@@ -41,6 +45,10 @@ public class BoardgameService {
     }
 
     public Boardgame updateBoardgame(Long id, Boardgame updatedBoardgame) {
+        if (updatedBoardgame.getName() == null || updatedBoardgame.getName().trim().isEmpty()) {
+            throw new BadRequestException("Naam van het bordspel mag niet leeg zijn.");
+        }
+    
         return boardgameRepository.findById(id).map(existingBoardgame -> {
             existingBoardgame.setName(updatedBoardgame.getName());
             existingBoardgame.setPrice(updatedBoardgame.getPrice());
@@ -50,10 +58,11 @@ public class BoardgameService {
             existingBoardgame.setMaxPlayers(updatedBoardgame.getMaxPlayers());
             existingBoardgame.setGenre(updatedBoardgame.getGenre());
             existingBoardgame.setPublisher(updatedBoardgame.getPublisher());
-
+    
             return boardgameRepository.save(existingBoardgame);
         }).orElseThrow(() -> new GameNotFoundException("Bordspel met ID " + id + " niet gevonden."));
     }
+    
 
     public void deleteBoardgame(Long id) {
         if (!boardgameRepository.existsById(id)) {

@@ -44,7 +44,6 @@ public class OpenApiConfig {
                 .description("API for managing boardgames, orders, and customers in a boardgame shop.")
                 .license(mitLicense);
 
-        // 🔒 Voeg JWT-authenticatie toe
         SecurityScheme securityScheme = new SecurityScheme()
                 .type(SecurityScheme.Type.HTTP)
                 .scheme("bearer")
