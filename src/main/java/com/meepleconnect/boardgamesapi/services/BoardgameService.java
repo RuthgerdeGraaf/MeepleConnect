@@ -78,6 +78,36 @@ public class BoardgameService {
     Long i = (long) id;
         return boardgameRepository.findById(i)
             .orElseThrow(() -> new GameNotFoundException("Bordspel met ID " + id + " niet gevonden."));
-}
+    }
+
+    public List<Boardgame> getFilteredBoardgames(String genre, Boolean available, Integer minPlayers, Integer maxPlayers) {
+        List<Boardgame> boardgames = boardgameRepository.findAll();
+
+        if (genre != null) {
+            boardgames = boardgames.stream()
+                .filter(game -> game.getGenre().equalsIgnoreCase(genre))
+                .toList();
+        }
+
+        if (available != null) {
+            boardgames = boardgames.stream()
+                .filter(game -> game.isAvailable() == available)
+                .toList();
+        }
+
+        if (minPlayers != null) {
+            boardgames = boardgames.stream()
+                .filter(game -> game.getMinPlayers() >= minPlayers)
+                .toList();
+    }
+
+        if (maxPlayers != null) {
+        boardgames = boardgames.stream()
+                .filter(game -> game.getMaxPlayers() <= maxPlayers)
+                .toList();
+        }
+
+        return boardgames;
+    }
 
 }

@@ -3,10 +3,11 @@ package com.meepleconnect.boardgamesapi;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes = MeepleConnectBoardgamesApiApplication.class)
+@SpringBootTest
 class MeepleConnectBoardgamesApiApplicationTests {
 
     @Test
     void contextLoads() {
+        // Controleert alleen of de Spring-context correct laadt.
     }
 }

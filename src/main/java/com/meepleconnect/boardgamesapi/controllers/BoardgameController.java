@@ -21,12 +21,15 @@ public class BoardgameController {
     }
 
     @GetMapping
-    public List<Boardgame> getAllBoardgames(@RequestParam(required = false) String genre) {
-        if (genre != null) {
-            return boardgameService.getBoardgamesByGenre(genre);
-        }
-        return boardgameService.getAllBoardgames();
+    public List<Boardgame> getAllBoardgames(
+        @RequestParam(required = false) String genre,
+        @RequestParam(required = false) Boolean available,
+        @RequestParam(required = false) Integer minPlayers,
+        @RequestParam(required = false) Integer maxPlayers
+    ) {
+        return boardgameService.getFilteredBoardgames(genre, available, minPlayers, maxPlayers);
     }
+    
 
     @GetMapping("/{id}")
     public ResponseEntity<Boardgame> getBoardgameById(@PathVariable Long id) {
