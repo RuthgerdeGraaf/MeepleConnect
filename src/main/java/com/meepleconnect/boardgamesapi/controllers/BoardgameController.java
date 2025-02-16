@@ -2,6 +2,7 @@ package com.meepleconnect.boardgamesapi.controllers;
 
 import com.meepleconnect.boardgamesapi.models.Boardgame;
 import com.meepleconnect.boardgamesapi.services.BoardgameService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/boardgames")
+@CrossOrigin(origins = "*")
 public class BoardgameController {
 
     private final BoardgameService boardgameService;
@@ -19,7 +21,10 @@ public class BoardgameController {
     }
 
     @GetMapping
-    public List<Boardgame> getAllBoardgames() {
+    public List<Boardgame> getAllBoardgames(@RequestParam(required = false) String genre) {
+        if (genre != null) {
+            return boardgameService.getBoardgamesByGenre(genre);
+        }
         return boardgameService.getAllBoardgames();
     }
 
@@ -30,13 +35,14 @@ public class BoardgameController {
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     @PostMapping
-    public ResponseEntity<Boardgame> addBoardgame(@RequestBody Boardgame boardgame) {
-        return ResponseEntity.ok(boardgameService.addBoardgame(boardgame));
+    public ResponseEntity<Boardgame> addBoardgame(@Valid @RequestBody Boardgame boardgame) {
+        Boardgame savedBoardgame = boardgameService.addBoardgame(boardgame);
+        return ResponseEntity.status(201).body(savedBoardgame);  // HTTP 201 Created
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     @PutMapping("/{id}")
-    public ResponseEntity<Boardgame> updateBoardgame(@PathVariable Long id, @RequestBody Boardgame boardgame) {
+    public ResponseEntity<Boardgame> updateBoardgame(@PathVariable Long id, @Valid @RequestBody Boardgame boardgame) {
         return ResponseEntity.ok(boardgameService.updateBoardgame(id, boardgame));
     }
 
