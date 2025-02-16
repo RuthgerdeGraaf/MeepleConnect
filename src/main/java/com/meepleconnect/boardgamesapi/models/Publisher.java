@@ -13,6 +13,7 @@ public class Publisher {
     private int founded;
     private boolean isIndie;
 
+    // ✅ Voeg ontbrekende GETTERS toe
     public String getName() {
         return name;
     }
@@ -27,5 +28,21 @@ public class Publisher {
 
     public boolean isIndie() {
         return isIndie;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCountryOfOrigin(String countryOfOrigin) {
+        this.countryOfOrigin = countryOfOrigin;
+    }
+
+    public void setFounded(int founded) {
+        this.founded = founded;
+    }
+
+    public void setIndie(boolean indie) {
+        isIndie = indie;
     }
 }
