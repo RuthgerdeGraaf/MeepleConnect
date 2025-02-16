@@ -144,6 +144,25 @@ class BoardgameControllerIT {
             .andExpect(status().isIAmATeapot()) 
             .andExpect(jsonPath("$.error").value("I'm a teapot"))
             .andExpect(jsonPath("$.message").value("Dit bordspel is een theepot!"));
-}
+    }
+    @Test
+    void getBoardgamesByGenre_ShouldReturnFilteredResults() throws Exception {
+        Boardgame strategyGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), 3, true, 1, 5, "Strategy", null);
+        Boardgame adventureGame = new Boardgame("Gloomhaven", new BigDecimal("89.99"), 2, true, 1, 4, "Adventure", null);
+        boardgameRepository.save(strategyGame);
+        boardgameRepository.save(adventureGame);
 
+        String jsonResponse = mockMvc.perform(get("/api/boardgames?genre=Strategy"))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        List<Boardgame> filteredBoardgames = objectMapper.readValue(jsonResponse, new TypeReference<List<Boardgame>>() {});
+
+        assertFalse(filteredBoardgames.isEmpty());
+        assertEquals(2, filteredBoardgames.size());
+        assertEquals("Catan", filteredBoardgames.get(0).getName());
+        assertEquals("Terraforming Mars", filteredBoardgames.get(1).getName());
+    }
 }
