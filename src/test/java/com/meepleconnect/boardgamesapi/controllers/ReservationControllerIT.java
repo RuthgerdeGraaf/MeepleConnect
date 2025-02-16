@@ -87,25 +87,21 @@ class ReservationControllerIT {
     @WithMockUser(roles = "CUSTOMER")
     void createReservation_ShouldCreateReservation() throws Exception {
         Reservation newReservation = new Reservation(testUser, testGame, LocalDate.now().plusDays(7), 3, "Another game night");
-
+    
         mockMvc.perform(post("/api/reservations")
-                        .param("customerId", testUser.getId().toString())
-                        .param("boardgameId", testGame.getId().toString())
-                        .param("reservationDate", newReservation.getReservationDate().toString())
-                        .param("participantCount", String.valueOf(newReservation.getParticipantCount()))
-                        .param("notes", newReservation.getNotes()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newReservation)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.notes").value("Another game night"));
     }
-
+    
     @Test
     void createReservation_Unauthorized_ShouldReturn403() throws Exception {
+        Reservation newReservation = new Reservation(testUser, testGame, LocalDate.now().plusDays(7), 3, "No access");
+    
         mockMvc.perform(post("/api/reservations")
-                        .param("customerId", testUser.getId().toString())
-                        .param("boardgameId", testGame.getId().toString())
-                        .param("reservationDate", LocalDate.now().plusDays(7).toString())
-                        .param("participantCount", "3")
-                        .param("notes", "No access"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newReservation)))
                 .andExpect(status().isForbidden());
     }
 

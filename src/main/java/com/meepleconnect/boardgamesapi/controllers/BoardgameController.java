@@ -37,7 +37,7 @@ public class BoardgameController {
     @PostMapping
     public ResponseEntity<Boardgame> addBoardgame(@Valid @RequestBody Boardgame boardgame) {
         Boardgame savedBoardgame = boardgameService.addBoardgame(boardgame);
-        return ResponseEntity.status(201).body(savedBoardgame);  // HTTP 201 Created
+        return ResponseEntity.status(201).body(savedBoardgame);
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")

@@ -15,13 +15,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "your-secret-key-your-secret-key-your-secret-key-"; // Zorg dat dit 256-bit is
+    private static final String SECRET_KEY = "your-secret-key-your-secret-key-your-secret-key-";
 
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 uur geldig
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
