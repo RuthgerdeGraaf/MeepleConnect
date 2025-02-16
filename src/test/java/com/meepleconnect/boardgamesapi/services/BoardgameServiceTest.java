@@ -2,6 +2,7 @@ package com.meepleconnect.boardgamesapi.services;
 
 import com.meepleconnect.boardgamesapi.exceptions.ConflictException;
 import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
+import com.meepleconnect.boardgamesapi.exceptions.TeapotException;
 import com.meepleconnect.boardgamesapi.models.Boardgame;
 import com.meepleconnect.boardgamesapi.repositories.BoardgameRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class BoardgameServiceTest {
@@ -124,4 +126,15 @@ class BoardgameServiceTest {
 
         assertThrows(GameNotFoundException.class, () -> boardgameService.deleteBoardgame(99L));
     }
+    @Test
+    void getSpecialBoardgame_ShouldThrowTeapotException() {
+        BoardgameService boardgameService = new BoardgameService(boardgameRepository);
+
+        TeapotException exception = assertThrows(TeapotException.class, () -> {
+        boardgameService.getSpecialBoardgame(418);
+    });
+
+    assertEquals("Dit bordspel is een theepot!", exception.getMessage());
+}
+
 }

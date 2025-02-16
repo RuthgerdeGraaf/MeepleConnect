@@ -3,6 +3,7 @@ package com.meepleconnect.boardgamesapi.services;
 import com.meepleconnect.boardgamesapi.exceptions.BadRequestException;
 import com.meepleconnect.boardgamesapi.exceptions.ConflictException;
 import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
+import com.meepleconnect.boardgamesapi.exceptions.TeapotException;
 import com.meepleconnect.boardgamesapi.models.Boardgame;
 import com.meepleconnect.boardgamesapi.repositories.BoardgameRepository;
 import org.springframework.stereotype.Service;
@@ -60,4 +61,14 @@ public class BoardgameService {
         }
         boardgameRepository.deleteById(id);
     }
+    
+    public Boardgame getSpecialBoardgame(int id) {
+    if (id == 418) {
+        throw new TeapotException("Dit bordspel is een theepot!");
+    }
+    Long i = (long) id;
+        return boardgameRepository.findById(i)
+            .orElseThrow(() -> new GameNotFoundException("Bordspel met ID " + id + " niet gevonden."));
+}
+
 }
