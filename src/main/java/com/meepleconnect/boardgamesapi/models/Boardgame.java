@@ -1,6 +1,7 @@
 package com.meepleconnect.boardgamesapi.models;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;  // ✅ Importeer BigDecimal
 
 @Entity
 public class Boardgame {
@@ -9,7 +10,7 @@ public class Boardgame {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private double price;
+    private BigDecimal price;
     private int expansions;
     private boolean available;
     private int minPlayers;
@@ -22,7 +23,7 @@ public class Boardgame {
 
     public Boardgame() {}
 
-    public Boardgame(String name, double price, int expansions, boolean available, 
+    public Boardgame(String name, BigDecimal price, int expansions, boolean available, 
                      int minPlayers, int maxPlayers, String genre, Publisher publisher) {
         this.name = name;
         this.price = price;
@@ -35,9 +36,8 @@ public class Boardgame {
     }
 
     public Long getId() { return id; }
-
     public String getName() { return name; }
-    public double getPrice() { return price; }
+    public BigDecimal getPrice() { return price; }
     public int getExpansions() { return expansions; }
     public boolean isAvailable() { return available; }
     public int getMinPlayers() { return minPlayers; }
@@ -46,7 +46,7 @@ public class Boardgame {
     public Publisher getPublisher() { return publisher; }
 
     public void setName(String name) { this.name = name; }
-    public void setPrice(double price) { this.price = price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
     public void setExpansions(int expansions) { this.expansions = expansions; }
     public void setAvailable(boolean available) { this.available = available; }
     public void setMinPlayers(int minPlayers) { this.minPlayers = minPlayers; }
