@@ -11,7 +11,7 @@ public class Boardgame {
     private Long id;
     private String name;
     private BigDecimal price;
-    private int expansions;
+    private boolean expansions;
     private boolean available;
     private int minPlayers;
     private int maxPlayers;
@@ -23,7 +23,7 @@ public class Boardgame {
 
     public Boardgame() {}
 
-    public Boardgame(String name, BigDecimal price, int expansions, boolean available, 
+    public Boardgame(String name, BigDecimal price, boolean expansions, boolean available, 
                      int minPlayers, int maxPlayers, String genre, Publisher publisher) {
         this.name = name;
         this.price = price;
@@ -38,7 +38,7 @@ public class Boardgame {
     public Long getId() { return id; }
     public String getName() { return name; }
     public BigDecimal getPrice() { return price; }
-    public int getExpansions() { return expansions; }
+    public boolean getExpansions() { return expansions; }
     public boolean isAvailable() { return available; }
     public int getMinPlayers() { return minPlayers; }
     public int getMaxPlayers() { return maxPlayers; }
@@ -47,7 +47,7 @@ public class Boardgame {
 
     public void setName(String name) { this.name = name; }
     public void setPrice(BigDecimal price) { this.price = price; }
-    public void setExpansions(int expansions) { this.expansions = expansions; }
+    public void setExpansions(boolean expansions) { this.expansions = expansions; }
     public void setAvailable(boolean available) { this.available = available; }
     public void setMinPlayers(int minPlayers) { this.minPlayers = minPlayers; }
     public void setMaxPlayers(int maxPlayers) { this.maxPlayers = maxPlayers; }
