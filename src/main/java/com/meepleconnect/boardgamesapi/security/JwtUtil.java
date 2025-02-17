@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "your-secret-key-your-secret-key-your-secret-key-";
+    private static final String SECRET_KEY = "rowaniseenheldhijheeftsupergeholpendankjewel";
 
     public String generateToken(String username) {
         return Jwts.builder()
