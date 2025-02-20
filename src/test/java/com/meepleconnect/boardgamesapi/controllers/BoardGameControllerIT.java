@@ -40,7 +40,7 @@ class BoardgameControllerIT {
     @BeforeEach
     void setUp() {
         boardgameRepository.deleteAll();
-        testGame = new Boardgame("Catan", new BigDecimal("39.99"), 2, true, 3, 4, "Strategy", null);
+        testGame = new Boardgame("Catan", new BigDecimal("39.99"), true, 3, 4, "Strategy", null);
         boardgameRepository.save(testGame);
     }
 
@@ -75,7 +75,7 @@ class BoardgameControllerIT {
     @Test
     @WithMockUser(roles = "EMPLOYEE")
     void addBoardgame_ShouldCreateGame() throws Exception {
-        Boardgame newGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), 3, true, 1, 5, "Strategy", null);
+        Boardgame newGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), true, 1, 5, "Strategy", null);
 
         mockMvc.perform(post("/api/boardgames")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -86,7 +86,7 @@ class BoardgameControllerIT {
 
     @Test
     void addBoardgame_Unauthorized_ShouldReturn403() throws Exception {
-        Boardgame newGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), 3, true, 1, 5, "Strategy", null);
+        Boardgame newGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), true, 1, 5, "Strategy", null);
 
         mockMvc.perform(post("/api/boardgames")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -97,7 +97,7 @@ class BoardgameControllerIT {
     @Test
     @WithMockUser(roles = "EMPLOYEE")
     void updateBoardgame_ShouldUpdateGame() throws Exception {
-        Boardgame updatedGame = new Boardgame("Updated Catan", new BigDecimal("49.99"), 3, true, 2, 5, "Adventure", null);
+        Boardgame updatedGame = new Boardgame("Updated Catan", new BigDecimal("49.99"), true, 2, 5, "Adventure", null);
 
         mockMvc.perform(put("/api/boardgames/" + testGame.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -109,7 +109,7 @@ class BoardgameControllerIT {
     @Test
     @WithMockUser(roles = "EMPLOYEE")
     void updateBoardgame_NonExisting_ShouldReturn404() throws Exception {
-        Boardgame updatedGame = new Boardgame("Updated Catan", new BigDecimal("49.99"), 3, true, 2, 5, "Adventure", null);
+        Boardgame updatedGame = new Boardgame("Updated Catan", new BigDecimal("49.99"), true, 2, 5, "Adventure", null);
 
         mockMvc.perform(put("/api/boardgames/999")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -147,8 +147,8 @@ class BoardgameControllerIT {
     }
     @Test
     void getBoardgamesByGenre_ShouldReturnFilteredResults() throws Exception {
-        Boardgame strategyGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), 3, true, 1, 5, "Strategy", null);
-        Boardgame adventureGame = new Boardgame("Gloomhaven", new BigDecimal("89.99"), 2, true, 1, 4, "Adventure", null);
+        Boardgame strategyGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), true, 1, 5, "Strategy", null);
+        Boardgame adventureGame = new Boardgame("Gloomhaven", new BigDecimal("89.99"), true, 1, 4, "Adventure", null);
         boardgameRepository.save(strategyGame);
         boardgameRepository.save(adventureGame);
 

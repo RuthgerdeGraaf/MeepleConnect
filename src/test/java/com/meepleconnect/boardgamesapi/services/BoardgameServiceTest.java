@@ -32,7 +32,7 @@ class BoardgameServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        testGame = new Boardgame("Catan", new BigDecimal("39.99"), 2, true, 3, 4, "Strategy", null);
+        testGame = new Boardgame("Catan", new BigDecimal("39.99"), true, 3, 4, "Strategy", null);
     }
 
     @Test
@@ -92,7 +92,7 @@ class BoardgameServiceTest {
 
     @Test
     void updateBoardgame_ExistingId_ShouldUpdateGame() {
-        Boardgame updatedGame = new Boardgame("Updated Catan", new BigDecimal("49.99"), 3, true, 2, 5, "Adventure", null);
+        Boardgame updatedGame = new Boardgame("Updated Catan", new BigDecimal("49.99"), true, 2, 5, "Adventure", null);
 
         when(boardgameRepository.findById(1L)).thenReturn(Optional.of(testGame));
         when(boardgameRepository.save(any(Boardgame.class))).thenReturn(updatedGame);
@@ -107,7 +107,7 @@ class BoardgameServiceTest {
     void updateBoardgame_NonExistingId_ShouldThrowException() {
         when(boardgameRepository.findById(99L)).thenReturn(Optional.empty());
 
-        Boardgame updatedGame = new Boardgame("Updated Catan", new BigDecimal("49.99"), 3, true, 2, 5, "Adventure", null);
+        Boardgame updatedGame = new Boardgame("Updated Catan", new BigDecimal("49.99"), true, 2, 5, "Adventure", null);
 
         assertThrows(GameNotFoundException.class, () -> boardgameService.updateBoardgame(99L, updatedGame));
     }

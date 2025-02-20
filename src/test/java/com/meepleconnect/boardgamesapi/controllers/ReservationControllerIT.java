@@ -52,7 +52,7 @@ class ReservationControllerIT {
         userRepository.deleteAll();
 
         testUser = new User("testUser", "password", null);
-        testGame = new Boardgame("Catan", BigDecimal.valueOf(39.99), 2, true, 3, 4, "Strategy", null);
+        testGame = new Boardgame("Catan", BigDecimal.valueOf(39.99), true, 3, 4, "Strategy", null);
         userRepository.save(testUser);
         boardgameRepository.save(testGame);
 
