@@ -11,11 +11,10 @@ public class Boardgame {
     private Long id;
     private String name;
     private BigDecimal price;
-    private boolean expansions;
-    private boolean available;
     private int minPlayers;
     private int maxPlayers;
     private String genre;
+    private boolean available;
 
     @ManyToOne
     @JoinColumn(name = "publisher_id")
@@ -23,11 +22,10 @@ public class Boardgame {
 
     public Boardgame() {}
 
-    public Boardgame(String name, BigDecimal price, boolean expansions, boolean available, 
+    public Boardgame(String name, BigDecimal price, boolean available, 
                      int minPlayers, int maxPlayers, String genre, Publisher publisher) {
         this.name = name;
         this.price = price;
-        this.expansions = expansions;
         this.available = available;
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
@@ -38,7 +36,6 @@ public class Boardgame {
     public Long getId() { return id; }
     public String getName() { return name; }
     public BigDecimal getPrice() { return price; }
-    public boolean getExpansions() { return expansions; }
     public boolean isAvailable() { return available; }
     public int getMinPlayers() { return minPlayers; }
     public int getMaxPlayers() { return maxPlayers; }
@@ -47,7 +44,6 @@ public class Boardgame {
 
     public void setName(String name) { this.name = name; }
     public void setPrice(BigDecimal price) { this.price = price; }
-    public void setExpansions(boolean expansions) { this.expansions = expansions; }
     public void setAvailable(boolean available) { this.available = available; }
     public void setMinPlayers(int minPlayers) { this.minPlayers = minPlayers; }
     public void setMaxPlayers(int maxPlayers) { this.maxPlayers = maxPlayers; }

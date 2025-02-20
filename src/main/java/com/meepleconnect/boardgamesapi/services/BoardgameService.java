@@ -52,7 +52,6 @@ public class BoardgameService {
         return boardgameRepository.findById(id).map(existingBoardgame -> {
             existingBoardgame.setName(updatedBoardgame.getName());
             existingBoardgame.setPrice(updatedBoardgame.getPrice());
-            existingBoardgame.setExpansions(updatedBoardgame.getExpansions());
             existingBoardgame.setAvailable(updatedBoardgame.isAvailable());
             existingBoardgame.setMinPlayers(updatedBoardgame.getMinPlayers());
             existingBoardgame.setMaxPlayers(updatedBoardgame.getMaxPlayers());

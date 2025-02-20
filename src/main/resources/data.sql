@@ -41,29 +41,12 @@ VALUES
     ('Kosmos', 'Germany', '1822', false),
     ('Rio Grande Games', 'United States', '1998', false);
 
--- INSERT INTO boardgames (name, price, expansions, available, min_players, max_players, genre, publisher_id)
+-- INSERT INTO boardgames (name, price, minPlayers, maxPlayers, genre, available, publisher)
 -- VALUES
---     ('Mansions of Madness', 99.99, 2, true, 1, 5, 'Horror', (SELECT id FROM publisher WHERE name = 'Fantasy Flight Games')),
---     ('Betrayal at House on the Hill', 49.99, 1, true, 3, 6, 'Horror', (SELECT id FROM publisher WHERE name = 'Avalon Hill')),
---     ('Dead of Winter', 59.99, 1, true, 2, 5, 'Horror', (SELECT id FROM publisher WHERE name = 'Plaid Hat Games')),
---     ('Zombicide', 99.99, 3, true, 1, 6, 'Horror', (SELECT id FROM publisher WHERE name = 'Cool Mini or Not')),
---     ('Arkham Horror', 59.99, 3, true, 1, 8, 'Horror', (SELECT id FROM publisher WHERE name = 'Fantasy Flight Games')),
---     ('Eldritch Horror', 59.99, 3, true, 1, 8, 'Horror', (SELECT id FROM publisher WHERE name = 'Fantasy Flight Games')),
---     ('Arkham Horror: The Card Game', 39.99, 4, true, 1, 2, 'Horror', (SELECT id FROM publisher WHERE name = 'Fantasy Flight Games')),
---     ('Descent: Journeys in the Dark', 79.99, 3, true, 2, 5, 'Adventure', (SELECT id FROM publisher WHERE name = 'Fantasy Flight Games')),
---     ('Star Wars: Imperial Assault', 99.99, 3, true, 2, 5, 'Adventure', (SELECT id FROM publisher WHERE name = 'Fantasy Flight Games')),
---     ('X-Wing Miniatures Game', 39.99, 5, true, 2, 4, 'Strategy', (SELECT id FROM publisher WHERE name = 'Fantasy Flight Games')),
---     ('A Game of Thrones: The Board Game', 59.99, 2, true, 3, 6, 'Strategy', (SELECT id FROM publisher WHERE name = 'Fantasy Flight Games')),
---     ('Twilight Imperium', 149.99, 1, true, 3, 6, 'Strategy', (SELECT id FROM publisher WHERE name = 'Fantasy Flight Games')),
---     ('Carcassonne', 34.99, 8, true, 2, 5, 'Strategy', (SELECT id FROM publisher WHERE name = '999 Games')),
---     ('Who Goes There', 59.99, 1, true, 3, 6, 'Horror', (SELECT id FROM publisher WHERE name = 'Certifiable Studios')),
---     ('Scythe', 79.99, 2, true, 1, 5, 'Strategy', (SELECT id FROM publisher WHERE name = 'Stonemaier Games')),
---     ('Gloomhaven', 139.99, 1, true, 1, 4, 'Adventure', (SELECT id FROM publisher WHERE name = 'Cephalofair Games')),
---     ('Terraforming Mars', 69.99, 2, true, 1, 5, 'Strategy', (SELECT id FROM publisher WHERE name = 'Stronghold Games')),
---     ('Wingspan', 59.99, 1, true, 1, 5, 'Strategy', (SELECT id FROM publisher WHERE name = 'Stonemaier Games')),
---     ('Azul', 39.99, 2, true, 2, 4, 'Strategy', (SELECT id FROM publisher WHERE name = 'Plan B Games')),
---     ('Ticket to Ride', 49.99, 5, true, 2, 5, 'Strategy', (SELECT id FROM publisher WHERE name = 'Days of Wonder'));
+--     ('Mansions of Madness', 99.99, 1, 5, 'Horror', true, (SELECT id FROM publisher WHERE name = 'Fantasy Flight Games')),
+--     ('Betrayal at House on the Hill', 49.99, 3, 6, 'Horror', true, (SELECT id FROM publisher WHERE name = 'Avalon Hill'));
 
+    -- Voeg andere spellen hier toe
 INSERT INTO users (username, password, role) 
 VALUES
     ('Ruthger', '$2a$12$IOfGkBw8cRrqz3NamrHG4O9FTXsPQ8Bo2/lNutMcitWIBzn1.Chj2', 'ADMIN'),
