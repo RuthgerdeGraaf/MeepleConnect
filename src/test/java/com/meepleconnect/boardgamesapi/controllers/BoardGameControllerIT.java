@@ -11,19 +11,22 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Transactional
 class BoardgameControllerIT {
 
     @Autowired
@@ -40,7 +43,7 @@ class BoardgameControllerIT {
     @BeforeEach
     void setUp() {
         boardgameRepository.deleteAll();
-        testGame = new Boardgame("Catan", new BigDecimal("39.99"), 2, true, 3, 4, "Strategy", null);
+        testGame = new Boardgame("Catan", new BigDecimal("39.99"), true, 2, 4, "Strategy", null);
         boardgameRepository.save(testGame);
     }
 
@@ -51,15 +54,14 @@ class BoardgameControllerIT {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-    
+
         List<Boardgame> boardgames = objectMapper.readValue(jsonResponse, new TypeReference<List<Boardgame>>() {});
-    
+
         assertFalse(boardgames.isEmpty());
         assertEquals("Catan", boardgames.get(0).getName());
     }
-    
-        
-            @Test
+
+    @Test
     void getBoardgameById_ShouldReturnGame() throws Exception {
         mockMvc.perform(get("/api/boardgames/" + testGame.getId()))
                 .andExpect(status().isOk())
@@ -75,7 +77,7 @@ class BoardgameControllerIT {
     @Test
     @WithMockUser(roles = "EMPLOYEE")
     void addBoardgame_ShouldCreateGame() throws Exception {
-        Boardgame newGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), 3, true, 1, 5, "Strategy", null);
+        Boardgame newGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), true, 1, 5, "Strategy", null);
 
         mockMvc.perform(post("/api/boardgames")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -86,7 +88,7 @@ class BoardgameControllerIT {
 
     @Test
     void addBoardgame_Unauthorized_ShouldReturn403() throws Exception {
-        Boardgame newGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), 3, true, 1, 5, "Strategy", null);
+        Boardgame newGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), true, 1, 5, "Strategy", null);
 
         mockMvc.perform(post("/api/boardgames")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -97,7 +99,7 @@ class BoardgameControllerIT {
     @Test
     @WithMockUser(roles = "EMPLOYEE")
     void updateBoardgame_ShouldUpdateGame() throws Exception {
-        Boardgame updatedGame = new Boardgame("Updated Catan", new BigDecimal("49.99"), 3, true, 2, 5, "Adventure", null);
+        Boardgame updatedGame = new Boardgame("Updated Catan", new BigDecimal("49.99"), true, 2, 5, "Adventure", null);
 
         mockMvc.perform(put("/api/boardgames/" + testGame.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -109,7 +111,7 @@ class BoardgameControllerIT {
     @Test
     @WithMockUser(roles = "EMPLOYEE")
     void updateBoardgame_NonExisting_ShouldReturn404() throws Exception {
-        Boardgame updatedGame = new Boardgame("Updated Catan", new BigDecimal("49.99"), 3, true, 2, 5, "Adventure", null);
+        Boardgame updatedGame = new Boardgame("Updated Catan", new BigDecimal("49.99"), true, 2, 5, "Adventure", null);
 
         mockMvc.perform(put("/api/boardgames/999")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -145,10 +147,11 @@ class BoardgameControllerIT {
             .andExpect(jsonPath("$.error").value("I'm a teapot"))
             .andExpect(jsonPath("$.message").value("Dit bordspel is een theepot!"));
     }
+
     @Test
     void getBoardgamesByGenre_ShouldReturnFilteredResults() throws Exception {
-        Boardgame strategyGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), 3, true, 1, 5, "Strategy", null);
-        Boardgame adventureGame = new Boardgame("Gloomhaven", new BigDecimal("89.99"), 2, true, 1, 4, "Adventure", null);
+        Boardgame strategyGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), true, 1, 5, "Strategy", null);
+        Boardgame adventureGame = new Boardgame("Gloomhaven", new BigDecimal("89.99"), true, 1, 4, "Adventure", null);
         boardgameRepository.save(strategyGame);
         boardgameRepository.save(adventureGame);
 

@@ -34,6 +34,8 @@ public class Boardgame {
     }
 
     public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; } // ✅ Toegevoegde setter
+
     public String getName() { return name; }
     public BigDecimal getPrice() { return price; }
     public boolean isAvailable() { return available; }

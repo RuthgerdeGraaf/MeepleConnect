@@ -14,6 +14,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -24,6 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Transactional
 class ReservationControllerIT {
 
     @Autowired
@@ -52,7 +56,7 @@ class ReservationControllerIT {
         userRepository.deleteAll();
 
         testUser = new User("testUser", "password", null);
-        testGame = new Boardgame("Catan", BigDecimal.valueOf(39.99), 2, true, 3, 4, "Strategy", null);
+        testGame = new Boardgame("Catan", BigDecimal.valueOf(39.99), true, 3, 4, "Strategy", null);
         userRepository.save(testUser);
         boardgameRepository.save(testGame);
 
@@ -76,6 +80,7 @@ class ReservationControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "EMPLOYEE")
     void getReservationsByCustomer_ShouldReturnList() throws Exception {
         mockMvc.perform(get("/api/reservations/customer/" + testUser.getId()))
                 .andExpect(status().isOk())
@@ -87,18 +92,18 @@ class ReservationControllerIT {
     @WithMockUser(roles = "CUSTOMER")
     void createReservation_ShouldCreateReservation() throws Exception {
         Reservation newReservation = new Reservation(testUser, testGame, LocalDate.now().plusDays(7), 3, "Another game night");
-    
+
         mockMvc.perform(post("/api/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newReservation)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.notes").value("Another game night"));
     }
-    
+
     @Test
     void createReservation_Unauthorized_ShouldReturn403() throws Exception {
         Reservation newReservation = new Reservation(testUser, testGame, LocalDate.now().plusDays(7), 3, "No access");
-    
+
         mockMvc.perform(post("/api/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newReservation)))
