@@ -41,6 +41,7 @@ public class Boardgame {
     public int getMaxPlayers() { return maxPlayers; }
     public String getGenre() { return genre; }
     public Publisher getPublisher() { return publisher; }
+    public void setId(Long id) { this.id = id; }
 
     public void setName(String name) { this.name = name; }
     public void setPrice(BigDecimal price) { this.price = price; }

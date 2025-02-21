@@ -81,4 +81,8 @@ public class Reservation {
     public void setNotes(String notes) {
         this.notes = notes;
     }
+
+    public void setUser(User user) {
+        throw new UnsupportedOperationException("Unimplemented method 'setUser'");
+    }
 }
