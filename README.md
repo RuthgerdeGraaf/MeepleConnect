@@ -73,4 +73,4 @@ Fullstack Development student at [**NOVI Hogeschool**](https://www.novi.nl/).
 ---
 
 💡 **Tip:**  
-Check out the [**Installation Guide**](./docs/INSTALLATION.md) for a detailed walkthrough on setting up the project, or use the [**Postman Collection**](./MeepleConnect.postman_collection.json) to explore the API endpoints directly.
+Check out the [**Installation Guide**](./INSTALLATION.md) for a detailed walkthrough on setting up the project, or use the [**Postman Collection**](./MeepleConnect.postman_collection.json) to explore the API endpoints directly.
