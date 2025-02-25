@@ -119,11 +119,6 @@
             <version>1.5.5.Final</version>
             <scope>provided</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.flywaydb</groupId>-->
-<!--            <artifactId>flyway-core</artifactId>-->
-<!--            <version>9.22.1</version>-->
-<!--        </dependency>-->
 
     </dependencies>
 

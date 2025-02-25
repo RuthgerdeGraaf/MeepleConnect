@@ -56,7 +56,6 @@
 | ⚡ **Spring Boot**  | Backend framework             |
 | 🛡️ **Spring Security** | Authentication & Authorization |
 | 📊 **PostgreSQL**   | Relational database           |
-| 📋 **Flyway**       | Database migrations           |
 | 🔀 **MapStruct**    | Object mapping (DTOs)         |
 | ⚡ **Lombok**       | Reduces boilerplate code      |
 | 📖 **Swagger (OpenAPI)** | API documentation       |

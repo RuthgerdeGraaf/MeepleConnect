@@ -20,7 +20,6 @@
 - **Spring Security**
 - **JWT Authentication**
 - **PostgreSQL** (or other relational databases via JPA)
-- **Flyway** (for database migrations)
 - **Lombok** & **MapStruct** (for code optimization)
 - **Postman** (for API testing)
 
@@ -34,7 +33,6 @@ Ensure the following tools are installed on your system:
 - **Maven** (for dependency management)
 - **PostgreSQL** (or another relational database like MySQL)
 - **Postman** (for API testing)
-- **Flyway** (automatically run via Maven)
 - **Git** (for cloning the repository)
 
 ---
@@ -62,7 +60,6 @@ cd MeepleConnect
 ### 🛠️ **3. Install dependencies and run migrations:**
 ```bash
 ./mvnw clean install
-./mvnw flyway:migrate
 ```
 
 ### 🚀 **4. Start the application:**
