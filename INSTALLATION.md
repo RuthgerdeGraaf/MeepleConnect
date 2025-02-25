@@ -55,8 +55,8 @@ cd MeepleConnect
 2. Update database credentials in `application.properties`:
    ```properties
    spring.datasource.url=jdbc:postgresql://localhost:5432/meepleconnect
-   spring.datasource.username=your_db_username
-   spring.datasource.password=your_db_password
+   spring.datasource.username=postgres
+   spring.datasource.password=password
    ```
 
 ### 🛠️ **3. Install dependencies and run migrations:**
