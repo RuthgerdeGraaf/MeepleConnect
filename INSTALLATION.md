@@ -21,7 +21,6 @@
 - **JWT Authentication**
 - **PostgreSQL** (or other relational databases via JPA)
 - **Flyway** (for database migrations)
-- **Lombok** & **MapStruct** (for code optimization)
 - **Postman** (for API testing)
 
 ---

@@ -58,7 +58,6 @@
 | 📊 **PostgreSQL**   | Relational database           |
 | 📋 **Flyway**       | Database migrations           |
 | 🔀 **MapStruct**    | Object mapping (DTOs)         |
-| ⚡ **Lombok**       | Reduces boilerplate code      |
 | 📖 **Swagger (OpenAPI)** | API documentation       |
 | 🧪 **JUnit & Mockito** | Unit and integration testing |
 | 🧱 **Maven**        | Dependency management         |

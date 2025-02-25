@@ -24,7 +24,8 @@ public class Reservation {
 
     private String notes;
 
-    public Reservation() {}
+    public Reservation() {
+    }
 
     public Reservation(User customer, Boardgame boardgame, LocalDate reservationDate, int participantCount, String notes) {
         this.customer = customer;
@@ -40,14 +41,6 @@ public class Reservation {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public User getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(User customer) {
-        this.customer = customer;
     }
 
     public Boardgame getBoardgame() {
@@ -66,23 +59,7 @@ public class Reservation {
         this.reservationDate = reservationDate;
     }
 
-    public int getParticipantCount() {
-        return participantCount;
-    }
 
-    public void setParticipantCount(int participantCount) {
-        this.participantCount = participantCount;
-    }
 
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public void setUser(User user) {
-        throw new UnsupportedOperationException("Unimplemented method 'setUser'");
-    }
 }
+

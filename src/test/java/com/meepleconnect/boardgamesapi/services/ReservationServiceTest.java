@@ -43,7 +43,6 @@ class ReservationServiceTest {
 
         reservation = new Reservation();
         reservation.setId(1L);
-        reservation.setUser(user);
         reservation.setBoardgame(boardgame);
         reservation.setReservationDate(LocalDate.now());
     }
@@ -88,7 +87,7 @@ class ReservationServiceTest {
         when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
         doNothing().when(reservationRepository).deleteById(1L);
 
-        reservationService.deleteReservation(1L);
+        reservationService.deleteReservation();
         verify(reservationRepository, times(1)).deleteById(1L);
     }
 
@@ -96,7 +95,7 @@ class ReservationServiceTest {
     void testDeleteReservation_NotFound() {
         when(reservationRepository.findById(2L)).thenReturn(Optional.empty());
 
-        assertThrows(ReservationNotFoundException.class, () -> reservationService.deleteReservation(2L));
+        assertThrows(ReservationNotFoundException.class, () -> reservationService.deleteReservation());
         verify(reservationRepository, times(1)).findById(2L);
     }
 }

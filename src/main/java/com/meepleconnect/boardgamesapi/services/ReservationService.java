@@ -62,11 +62,10 @@ public class ReservationService {
     }
 
     public Object createReservation(Reservation reservation) {
-        throw new UnsupportedOperationException("Unimplemented method 'createReservation'");
+            return reservationRepository.save(new Reservation());
     }
 
-    public void deleteReservation(long l) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteReservation'");
+    public Object deleteReservation() {
+            return reservationRepository;
     }
 }
