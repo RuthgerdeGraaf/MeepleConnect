@@ -20,13 +20,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Object getUserById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUserById'");
-    }
 
-    public void deleteUser(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteUser'");
+    public Object getUserById(Long id) { return userRepository.findById(id); }
+
+    public void deleteUser(Long id) { userRepository.deleteById(id);
     }
 }
+
