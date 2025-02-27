@@ -110,7 +110,6 @@ class ReservationServiceTest {
         verify(reservationRepository, times(1)).save(any(Reservation.class));
     }
 
-
     @Test
     void testCreateReservation_Failure_NoCustomer() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
