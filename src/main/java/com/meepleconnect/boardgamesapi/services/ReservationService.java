@@ -1,6 +1,7 @@
 package com.meepleconnect.boardgamesapi.services;
 
 import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
+import com.meepleconnect.boardgamesapi.exceptions.ReservationNotFoundException;
 import com.meepleconnect.boardgamesapi.models.Reservation;
 import com.meepleconnect.boardgamesapi.models.Boardgame;
 import com.meepleconnect.boardgamesapi.models.User;
@@ -31,11 +32,21 @@ public class ReservationService {
     }
 
     public List<Reservation> getReservationsByCustomer(Long customerId) {
-        return reservationRepository.findByCustomerId(customerId);
+        List<Reservation> reservations = reservationRepository.findByCustomerId(customerId);
+        if (reservations.isEmpty()) {
+            throw new ReservationNotFoundException("No reservations found for customer ID " + customerId);
+        }
+        return reservations;
     }
 
+
     public List<Reservation> getReservationsByBoardgame(Long boardgameId) {
-        return reservationRepository.findByBoardgameId(boardgameId);
+//        return reservationRepository.findByBoardgameId(boardgameId)
+        List<Reservation> reservations = reservationRepository.findByBoardgameId(boardgameId);
+        if (reservations.isEmpty()) {
+            throw new ReservationNotFoundException("No reservations found for boardgame ID " + boardgameId);
+        }
+        return reservations;
     }
 
     public Reservation createReservation(Long customerId, Long boardgameId, LocalDate reservationDate, int participantCount, String notes) {

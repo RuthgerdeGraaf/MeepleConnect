@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,37 +66,29 @@ class ReservationServiceTest {
         verify(reservationRepository, times(1)).findByCustomerId(1L);
     }
 
-//    @Test
-//    void testReservationsByCustomer_NotFound() {
-//        when(reservationRepository.findByCustomerId(2L)).thenReturn(Arrays.asList());
-//
-//        assertThrows(ReservationNotFoundException.class, () -> reservationService.getReservationsByCustomer(2L));
-//        verify(reservationRepository, times(1)).findByCustomerId(2L);
-//    }
+    @Test
+    void testGetReservationByCustomer_Failure() {
+        when(reservationRepository.findByCustomerId(1L)).thenReturn(Collections.emptyList());
 
-//    @Test
-//    void testCreateReservation() {
-//        when(reservationRepository.save(reservation)).thenReturn(reservation);
-//
-//        var createdReservation = reservationService.createReservation(reservation);
-//        assertEquals(reservation, createdReservation);
-//        verify(reservationRepository, times(1)).save(reservation);
-//    }
+        assertThrows(ReservationNotFoundException.class, () -> reservationService.getReservationsByCustomer(1L));
 
-//    @Test
-//    void testDeleteReservation_Success() {
-//        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
-//        doNothing().when(reservationRepository).deleteById(1L);
-//
-//        reservationService.deleteReservation(1L);
-//        verify(reservationRepository, times(1)).deleteById(1L);
-//    }
+        verify(reservationRepository, times(1)).findByCustomerId(1L);
+    }
 
-//    @Test
-//    void testDeleteReservation_NotFound() {
-//        when(reservationRepository.findById(2L)).thenReturn(Optional.empty());
-//
-//        assertThrows(ReservationNotFoundException.class, () -> reservationService.deleteReservation(2L));
-//        verify(reservationRepository, times(1)).findById(2L);
-//    }
+
+    @Test
+    void testgetReservationsByBoardgame_Success() {
+        when(reservationRepository.findByBoardgameId(1L)).thenReturn(Arrays.asList(reservation));
+
+        var result = reservationService.getReservationsByBoardgame(1L);
+        assertEquals(1, result.size());
+        verify(reservationRepository, times(1)).findByBoardgameId(1L);
+    }
+
+    @Test
+    void testGetReservationsByBoardgame_Failure() {
+        when(reservationRepository.findByBoardgameId(1L)).thenReturn(Collections.emptyList());
+        assertThrows(ReservationNotFoundException.class, () -> reservationService.getReservationsByBoardgame(1L));
+        verify(reservationRepository, times(1)).findByBoardgameId(1L);
+    }
 }
