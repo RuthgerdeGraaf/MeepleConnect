@@ -110,14 +110,6 @@ class ReservationServiceTest {
         verify(reservationRepository, times(1)).save(any(Reservation.class));
     }
 
-//    @Test
-//    void testCreateReservation_Failure() {
-//        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-//        when(boardgameRepository.findById(1L)).thenReturn(Optional.of(boardgame));
-//        when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
-//        assertThrows(ReservationNotFoundException.class, () -> reservationService.getReservationsByBoardgame(1L));
-//        verify(reservationRepository, times(0)).save(any(Reservation.class));
-//    }
 
     @Test
     void testCreateReservation_Failure_NoCustomer() {
