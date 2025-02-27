@@ -1,6 +1,7 @@
 package com.meepleconnect.boardgamesapi.services;
 
 import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
+import com.meepleconnect.boardgamesapi.exceptions.ReservationNotFoundException;
 import com.meepleconnect.boardgamesapi.models.Reservation;
 import com.meepleconnect.boardgamesapi.models.Boardgame;
 import com.meepleconnect.boardgamesapi.models.User;
@@ -31,11 +32,20 @@ public class ReservationService {
     }
 
     public List<Reservation> getReservationsByCustomer(Long customerId) {
-        return reservationRepository.findByCustomerId(customerId);
+        List<Reservation> reservations = reservationRepository.findByCustomerId(customerId);
+        if (reservations.isEmpty()) {
+            throw new ReservationNotFoundException("No reservations found for customer ID " + customerId);
+        }
+        return reservations;
     }
 
+
     public List<Reservation> getReservationsByBoardgame(Long boardgameId) {
-        return reservationRepository.findByBoardgameId(boardgameId);
+        List<Reservation> reservations = reservationRepository.findByBoardgameId(boardgameId);
+        if (reservations.isEmpty()) {
+            throw new ReservationNotFoundException("No reservations found for boardgame ID " + boardgameId);
+        }
+        return reservations;
     }
 
     public Reservation createReservation(Long customerId, Long boardgameId, LocalDate reservationDate, int participantCount, String notes) {
@@ -43,11 +53,11 @@ public class ReservationService {
         Optional<Boardgame> boardgame = boardgameRepository.findById(boardgameId);
 
         if (customer.isEmpty()) {
-            throw new GameNotFoundException("Klant met ID " + customerId + " niet gevonden.");
+            throw new GameNotFoundException("Customer with ID " + customerId + " wasn't found.");
         }
 
         if (boardgame.isEmpty()) {
-            throw new GameNotFoundException("Bordspel met ID " + boardgameId + " niet gevonden.");
+            throw new GameNotFoundException("Boardgame with ID " + boardgameId + " wasn't found.");
         }
 
         Reservation reservation = new Reservation(customer.get(), boardgame.get(), reservationDate, participantCount, notes);
@@ -56,7 +66,7 @@ public class ReservationService {
 
     public void cancelReservation(Long reservationId) {
         if (!reservationRepository.existsById(reservationId)) {
-            throw new GameNotFoundException("Reservering met ID " + reservationId + " niet gevonden.");
+            throw new GameNotFoundException("Reservation with ID " + reservationId + " wasn't found.");
         }
         reservationRepository.deleteById(reservationId);
     }
