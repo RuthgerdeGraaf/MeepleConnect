@@ -1,4 +1,4 @@
-//package com.meepleconnect.boardgamesapi.services;
+package com.meepleconnect.boardgamesapi.services;
 //
 //import com.meepleconnect.boardgamesapi.exceptions.ConflictException;
 //import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
