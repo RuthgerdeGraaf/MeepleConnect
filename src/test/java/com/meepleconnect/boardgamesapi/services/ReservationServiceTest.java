@@ -127,4 +127,18 @@ class ReservationServiceTest {
         assertThrows(GameNotFoundException.class, () -> reservationService.createReservation(1L, 1L, LocalDate.now(), 1, "Test"));
         verify(reservationRepository, times(0)).save(any(Reservation.class));
     }
+
+    @Test
+    void testCancelReservation_Success() {
+        when(reservationRepository.existsById(1L)).thenReturn(true);
+        reservationService.cancelReservation(1L);
+        assertEquals(0, reservationRepository.findAll().size());
+        verify(reservationRepository, times(1)).deleteById(1L);
+    }
+    @Test
+    void testCancelReservation_Failure() {
+        when(reservationRepository.existsById(1L)).thenReturn(false);
+        assertThrows(GameNotFoundException.class, () -> reservationService.cancelReservation(1L));
+        verify(reservationRepository, times(0)).deleteById(1L);
+    }
 }
