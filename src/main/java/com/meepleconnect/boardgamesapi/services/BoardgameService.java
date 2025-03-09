@@ -29,12 +29,12 @@ public class BoardgameService {
 
     public Boardgame getBoardgameById(Long id) {
         return boardgameRepository.findById(id)
-                .orElseThrow(() -> new GameNotFoundException("Bordspel met ID " + id + " niet gevonden."));
+                .orElseThrow(() -> new GameNotFoundException("Boardgame with ID " + id + " not found."));
     }
 
     public Boardgame addBoardgame(Boardgame boardgame) {
         if (boardgame.getName() == null || boardgame.getName().trim().isEmpty()) {
-            throw new BadRequestException("Naam van het bordspel mag niet leeg zijn.");
+            throw new BadRequestException("Name of boardgame can't be empty.");
         }
         
         Optional<Boardgame> existingBoardgame = boardgameRepository.findByNameIgnoreCase(boardgame.getName());
@@ -46,7 +46,7 @@ public class BoardgameService {
 
     public Boardgame updateBoardgame(Long id, Boardgame updatedBoardgame) {
         if (updatedBoardgame.getName() == null || updatedBoardgame.getName().trim().isEmpty()) {
-            throw new BadRequestException("Naam van het bordspel mag niet leeg zijn.");
+            throw new BadRequestException("Name of boardgame can't be empty.");
         }
     
         return boardgameRepository.findById(id).map(existingBoardgame -> {
@@ -59,24 +59,24 @@ public class BoardgameService {
             existingBoardgame.setPublisher(updatedBoardgame.getPublisher());
     
             return boardgameRepository.save(existingBoardgame);
-        }).orElseThrow(() -> new GameNotFoundException("Bordspel met ID " + id + " niet gevonden."));
+        }).orElseThrow(() -> new GameNotFoundException("Boardgame with ID " + id + " not found."));
     }
     
 
     public void deleteBoardgame(Long id) {
         if (!boardgameRepository.existsById(id)) {
-            throw new GameNotFoundException("Bordspel met ID " + id + " niet gevonden.");
+            throw new GameNotFoundException("Boardgame with ID " + id + " not found.");
         }
         boardgameRepository.deleteById(id);
     }
     
     public Boardgame getSpecialBoardgame(int id) {
     if (id == 418) {
-        throw new TeapotException("Dit bordspel is een theepot!");
+        throw new TeapotException("Dit boardgame is a teapot!");
     }
     Long i = (long) id;
         return boardgameRepository.findById(i)
-            .orElseThrow(() -> new GameNotFoundException("Bordspel met ID " + id + " niet gevonden."));
+            .orElseThrow(() -> new GameNotFoundException("Boardgame with ID " + id + " not found."));
     }
 
     public List<Boardgame> getFilteredBoardgames(String genre, Boolean available, Integer minPlayers, Integer maxPlayers) {

@@ -1,5 +1,6 @@
 package com.meepleconnect.boardgamesapi.services;
 
+import com.meepleconnect.boardgamesapi.exceptions.BadRequestException;
 import com.meepleconnect.boardgamesapi.exceptions.ConflictException;
 import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
 import com.meepleconnect.boardgamesapi.exceptions.TeapotException;
@@ -7,6 +8,7 @@ import com.meepleconnect.boardgamesapi.models.Boardgame;
 import com.meepleconnect.boardgamesapi.repositories.BoardgameRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestTemplate;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -97,6 +99,12 @@ class BoardgameServiceTest {
     }
 
     @Test
+    void addBoardgame_No_Name_Failure() {
+        Boardgame invalidGame = new Boardgame("", new BigDecimal("29.99"), true, 2, 5, "Adventure", null);
+        assertThrows(BadRequestException.class, () -> boardgameService.addBoardgame(invalidGame));
+    }
+
+    @Test
     void updateBoardgame_ExistingId_ShouldUpdateGame() {
         Boardgame updatedGame = new Boardgame("Updated Catan", new BigDecimal("49.99"), true, 2, 5, "Adventure", null);
 
@@ -121,6 +129,12 @@ class BoardgameServiceTest {
     }
 
     @Test
+    void updateBoardgame_No_Name_Failure() {
+        Boardgame invalidGame = new Boardgame("", new BigDecimal("29.99"), true, 2, 5, "Adventure", null);
+        assertThrows(BadRequestException.class, () -> boardgameService.updateBoardgame(1L, invalidGame));
+    }
+
+    @Test
     void deleteBoardgame_ExistingId_ShouldDeleteGame() {
         when(boardgameRepository.existsById(1L)).thenReturn(true);
         doNothing().when(boardgameRepository).deleteById(1L);
@@ -136,16 +150,51 @@ class BoardgameServiceTest {
         assertThrows(GameNotFoundException.class, () -> boardgameService.deleteBoardgame(99L));
         verify(boardgameRepository, times(1)).existsById(99L);
     }
+
     @Test
-    void getSpecialBoardgame_ShouldThrowTeapotException() {
-        BoardgameService boardgameService = new BoardgameService(boardgameRepository);
+    void getFilteredBoardgames_ShouldFilterByGenre() {
+        when(boardgameRepository.findAll()).thenReturn(List.of(testGame));
+        List<Boardgame> result = boardgameService.getFilteredBoardgames("Strategy", null, null, null);
+        assertEquals(1, result.size());
+        assertEquals("Catan", result.get(0).getName());
+    }
 
-        TeapotException exception = assertThrows(TeapotException.class, () -> {
-        boardgameService.getSpecialBoardgame(418);
-        verify(boardgameService , times(1)).getSpecialBoardgame(418);
-    });
+    @Test
+    void getFilteredBoardgames_ShouldFilterByAvailability() {
+        when(boardgameRepository.findAll()).thenReturn(List.of(testGame));
+        List<Boardgame> result = boardgameService.getFilteredBoardgames(null, true, null, null);
+        assertEquals(1, result.size());
+    }
 
-    assertEquals("Dit bordspel is een theepot!", exception.getMessage());
-}
+    @Test
+    void getFilteredBoardgames_ShouldFilterByMinPlayers() {
+        when(boardgameRepository.findAll()).thenReturn(List.of(testGame));
+        List<Boardgame> result = boardgameService.getFilteredBoardgames(null, null, 3, null);
+        assertEquals(1, result.size());
+    }
 
+    @Test
+    void getFilteredBoardgames_ShouldFilterByMaxPlayers() {
+        when(boardgameRepository.findAll()).thenReturn(List.of(testGame));
+        List<Boardgame> result = boardgameService.getFilteredBoardgames(null, null, null, 4);
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void getFilteredBoardgames_NoMatches_ShouldReturnEmptyList() {
+        when(boardgameRepository.findAll()).thenReturn(List.of(testGame));
+        List<Boardgame> result = boardgameService.getFilteredBoardgames("Adventure", null, null, null);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getSpecialBoardgame_ExistingId_ShouldReturnBoardgame() {
+        when(boardgameRepository.findById(1L)).thenReturn(Optional.of(testGame));
+        Boardgame result = boardgameService.getSpecialBoardgame(1);
+        assertEquals("Catan", result.getName());
+    }
+    @Test
+    void getSpecialBoardgame_TheepotId_ShouldThrowTeapotException() {
+        assertThrows(TeapotException.class, () -> boardgameService.getSpecialBoardgame(418));
+    }
 }
