@@ -59,12 +59,12 @@ cd MeepleConnect
 
 ### 🛠️ **3. Install dependencies and run migrations:**
 ```bash
-./mvnw clean install
+./mvn clean install
 ```
 
 ### 🚀 **4. Start the application:**
 ```bash
-./mvnw spring-boot:run
+./mvn spring-boot:run
 ```
 
 The web API will be available at:
