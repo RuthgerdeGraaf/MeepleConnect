@@ -135,6 +135,12 @@ public class BoardgameServiceTest {
     }
 
     @Test
+    void updateBoardgame_NullName_ShouldThrowException() {
+        Boardgame invalidGame = new Boardgame(null, new BigDecimal("29.99"), true, 2, 5, "Adventure", null);
+        assertThrows(BadRequestException.class, () -> boardgameService.updateBoardgame(1L, invalidGame));
+    }
+
+    @Test
     void deleteBoardgame_ExistingId_ShouldDeleteGame() {
         when(boardgameRepository.existsById(1L)).thenReturn(true);
         doNothing().when(boardgameRepository).deleteById(1L);
@@ -188,6 +194,36 @@ public class BoardgameServiceTest {
     }
 
     @Test
+    void getFilteredBoardgames_ShouldFilterByMultipleCriteria() {
+        Boardgame game1 = new Boardgame("Catan", new BigDecimal("39.99"), true, 3, 4, "Strategy", null);
+        Boardgame game2 = new Boardgame("Ticket to Ride", new BigDecimal("34.99"), true, 2, 5, "Family", null);
+        when(boardgameRepository.findAll()).thenReturn(List.of(game1, game2));
+        
+        List<Boardgame> result = boardgameService.getFilteredBoardgames("Strategy", true, 3, 4);
+        assertEquals(1, result.size());
+        assertEquals("Catan", result.get(0).getName());
+    }
+
+    @Test
+    void getFilteredBoardgames_ShouldHandleEqualMinMaxPlayers() {
+        Boardgame game = new Boardgame("Catan", new BigDecimal("39.99"), true, 4, 4, "Strategy", null);
+        when(boardgameRepository.findAll()).thenReturn(List.of(game));
+        
+        List<Boardgame> result = boardgameService.getFilteredBoardgames(null, null, 4, 4);
+        assertEquals(1, result.size());
+        assertEquals("Catan", result.get(0).getName());
+    }
+
+    @Test
+    void getFilteredBoardgames_ShouldReturnEmptyWhenMinPlayersGreaterThanMaxPlayers() {
+        Boardgame game = new Boardgame("Catan", new BigDecimal("39.99"), true, 3, 4, "Strategy", null);
+        when(boardgameRepository.findAll()).thenReturn(List.of(game));
+        
+        List<Boardgame> result = boardgameService.getFilteredBoardgames(null, null, 5, 4);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     void getSpecialBoardgame_ExistingId_ShouldReturnBoardgame() {
         when(boardgameRepository.findById(1L)).thenReturn(Optional.of(testGame));
         Boardgame result = boardgameService.getSpecialBoardgame(1);
@@ -196,5 +232,55 @@ public class BoardgameServiceTest {
     @Test
     void getSpecialBoardgame_TheepotId_ShouldThrowTeapotException() {
         assertThrows(TeapotException.class, () -> boardgameService.getSpecialBoardgame(418));
+    }
+
+    @Test
+    void getSpecialBoardgame_NonExistingId_ShouldThrowException() {
+        when(boardgameRepository.findById(99L)).thenReturn(Optional.empty());
+        assertThrows(GameNotFoundException.class, () -> boardgameService.getSpecialBoardgame(99));
+    }
+
+    @Test
+    void getFilteredBoardgames_ShouldHandleNullValues() {
+        when(boardgameRepository.findAll()).thenReturn(List.of(testGame));
+        List<Boardgame> result = boardgameService.getFilteredBoardgames(null, null, null, null);
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void getFilteredBoardgames_ShouldHandleEmptyGenre() {
+        when(boardgameRepository.findAll()).thenReturn(List.of(testGame));
+        List<Boardgame> result = boardgameService.getFilteredBoardgames("", null, null, null);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getFilteredBoardgames_ShouldHandleNegativePlayers() {
+        when(boardgameRepository.findAll()).thenReturn(List.of(testGame));
+        List<Boardgame> result = boardgameService.getFilteredBoardgames(null, null, -1, -1);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void addBoardgame_NullName_ShouldThrowException() {
+        Boardgame invalidGame = new Boardgame(null, new BigDecimal("29.99"), true, 2, 5, "Adventure", null);
+        assertThrows(BadRequestException.class, () -> boardgameService.addBoardgame(invalidGame));
+    }
+
+    @Test
+    void addBoardgame_WhitespaceName_ShouldThrowException() {
+        Boardgame invalidGame = new Boardgame("   ", new BigDecimal("29.99"), true, 2, 5, "Adventure", null);
+        assertThrows(BadRequestException.class, () -> boardgameService.addBoardgame(invalidGame));
+    }
+
+    @Test
+    void getFilteredBoardgames_ShouldFilterByUnavailableGames() {
+        Boardgame availableGame = new Boardgame("Catan", new BigDecimal("39.99"), true, 3, 4, "Strategy", null);
+        Boardgame unavailableGame = new Boardgame("Ticket to Ride", new BigDecimal("34.99"), false, 2, 5, "Family", null);
+        when(boardgameRepository.findAll()).thenReturn(List.of(availableGame, unavailableGame));
+        
+        List<Boardgame> result = boardgameService.getFilteredBoardgames(null, false, null, null);
+        assertEquals(1, result.size());
+        assertEquals("Ticket to Ride", result.get(0).getName());
     }
 }
