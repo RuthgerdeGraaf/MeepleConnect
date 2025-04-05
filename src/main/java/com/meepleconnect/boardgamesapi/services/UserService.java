@@ -5,6 +5,8 @@ import com.meepleconnect.boardgamesapi.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -20,10 +22,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public Optional<User> getUserById(Long id) {
+        return userRepository.findById(id);
+    }
 
-    public Object getUserById(Long id) { return userRepository.findById(id); }
-
-    public void deleteUser(Long id) { userRepository.deleteById(id);
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 }
 

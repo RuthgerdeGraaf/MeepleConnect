@@ -1,29 +1,38 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meepleconnect.boardgamesapi.models.User;
 import com.meepleconnect.boardgamesapi.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SuppressWarnings("unused")
-class UserControllerTest {
+@SpringBootTest
+@AutoConfigureMockMvc
+public class UserControllerTest {
 
-    @Mock
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
     private UserService userService;
 
-    @InjectMocks
-    private UserController userController;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
@@ -31,57 +40,94 @@ class UserControllerTest {
     }
 
     @Test
-    void testRegisterUser_Success() {
+    @WithMockUser(roles = {"EMPLOYEE"})
+    void testRegisterUser_Success() throws Exception {
+        // Arrange
         User user = new User();
-        user.setUsername("TestUser");
+        user.setUsername("testuser");
+        user.setPassword("password");
+        User savedUser = new User();
+        savedUser.setId(1L);
+        savedUser.setUsername("testuser");
+        savedUser.setPassword("password");
+
+        when(userService.registerUser(any(User.class))).thenReturn(savedUser);
+
+        // Act & Assert
+        mockMvc.perform(post("/api/users/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.username").value("testuser"));
+
+        verify(userService, times(1)).registerUser(any(User.class));
+    }
+
+    @Test
+    @WithMockUser(roles = {"EMPLOYEE"})
+    void testRegisterUser_Failure() throws Exception {
+        // Arrange
+        User user = new User();
+        user.setUsername("testuser");
         user.setPassword("password");
 
-        when(userService.registerUser(user)).thenReturn(user);
+        when(userService.registerUser(any(User.class)))
+            .thenThrow(new RuntimeException("Registratiefout"));
 
-        ResponseEntity<?> response = userController.registerUser(user);
+        // Act & Assert
+        mockMvc.perform(post("/api/users/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Fout bij registratie: Registratiefout"));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(user, response.getBody());
-        verify(userService, times(1)).registerUser(user);
-    }
-
-    @Test
-    void testRegisterUser_Failure() {
-        User user = new User();
-        user.setUsername("TestUser");
-
-        when(userService.registerUser(user)).thenThrow(new RuntimeException("Registratiefout"));
-
-        ResponseEntity<?> response = userController.registerUser(user);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Fout bij registratie: Registratiefout", response.getBody());
-        verify(userService, times(1)).registerUser(user);
+        verify(userService, times(1)).registerUser(any(User.class));
     }
 
     @Test
     @WithMockUser(roles = {"EMPLOYEE"})
-    void testGetUserById_Success() {
+    void testGetUserById_Success() throws Exception {
+        // Arrange
         User user = new User();
         user.setId(1L);
-        user.setUsername("TestUser");
+        user.setUsername("testuser");
+        user.setPassword("password");
 
-        when(userService.getUserById(1L)).thenReturn(user);
+        when(userService.getUserById(1L)).thenReturn(Optional.of(user));
 
-        ResponseEntity<Object> response = userController.getUserById(1L);
+        // Act & Assert
+        mockMvc.perform(get("/api/users/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.username").value("testuser"));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(user, response.getBody());
+        verify(userService, times(1)).getUserById(1L);
     }
 
     @Test
     @WithMockUser(roles = {"EMPLOYEE"})
-    void testDeleteUser_Success() {
+    void testGetUserById_NotFound() throws Exception {
+        // Arrange
+        when(userService.getUserById(1L)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        mockMvc.perform(get("/api/users/1"))
+                .andExpect(status().isNotFound());
+
+        verify(userService, times(1)).getUserById(1L);
+    }
+
+    @Test
+    @WithMockUser(roles = {"EMPLOYEE"})
+    void testDeleteUser_Success() throws Exception {
+        // Arrange
         doNothing().when(userService).deleteUser(1L);
 
-        ResponseEntity<Void> response = userController.deleteUser(1L);
+        // Act & Assert
+        mockMvc.perform(delete("/api/users/1"))
+                .andExpect(status().isNoContent());
 
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(userService, times(1)).deleteUser(1L);
     }
 }

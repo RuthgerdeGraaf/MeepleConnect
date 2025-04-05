@@ -32,20 +32,11 @@ public class ReservationService {
     }
 
     public List<Reservation> getReservationsByCustomer(Long customerId) {
-        List<Reservation> reservations = reservationRepository.findByCustomerId(customerId);
-        if (reservations.isEmpty()) {
-            throw new ReservationNotFoundException("No reservations found for customer ID " + customerId);
-        }
-        return reservations;
+        return reservationRepository.findByCustomerId(customerId);
     }
 
-
     public List<Reservation> getReservationsByBoardgame(Long boardgameId) {
-        List<Reservation> reservations = reservationRepository.findByBoardgameId(boardgameId);
-        if (reservations.isEmpty()) {
-            throw new ReservationNotFoundException("No reservations found for boardgame ID " + boardgameId);
-        }
-        return reservations;
+        return reservationRepository.findByBoardgameId(boardgameId);
     }
 
     public Reservation createReservation(Long customerId, Long boardgameId, LocalDate reservationDate, int participantCount, String notes) {

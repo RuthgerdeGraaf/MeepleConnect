@@ -6,6 +6,8 @@ import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
 import com.meepleconnect.boardgamesapi.exceptions.TeapotException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -18,7 +20,9 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class ExceptionControllerTest {
+@SpringBootTest
+@AutoConfigureMockMvc
+public class ExceptionControllerTest {
 
     private ExceptionController exceptionController;
 

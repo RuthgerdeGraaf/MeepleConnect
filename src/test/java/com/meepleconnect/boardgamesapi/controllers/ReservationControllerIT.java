@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class ReservationControllerIT {
+public class ReservationControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
@@ -65,7 +65,9 @@ class ReservationControllerIT {
     void getAllReservations_ShouldReturnList() throws Exception {
         mockMvc.perform(get("/api/reservations"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].reservationDate").exists())
+                .andExpect(jsonPath("$[0].participantCount").value(4))
                 .andExpect(jsonPath("$[0].notes").value("Game night!"));
     }
 
@@ -76,32 +78,40 @@ class ReservationControllerIT {
     }
 
     @Test
+    @WithMockUser
     void getReservationsByCustomer_ShouldReturnList() throws Exception {
         mockMvc.perform(get("/api/reservations/customer/" + testUser.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].reservationDate").exists())
+                .andExpect(jsonPath("$[0].participantCount").value(4))
                 .andExpect(jsonPath("$[0].notes").value("Game night!"));
     }
 
     @Test
     @WithMockUser(roles = "CUSTOMER")
     void createReservation_ShouldCreateReservation() throws Exception {
-        Reservation newReservation = new Reservation(testUser, testGame, LocalDate.now().plusDays(7), 3, "Another game night");
-
         mockMvc.perform(post("/api/reservations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newReservation)))
+                        .param("customerId", testUser.getId().toString())
+                        .param("boardgameId", testGame.getId().toString())
+                        .param("reservationDate", LocalDate.now().plusDays(7).toString())
+                        .param("participantCount", "3")
+                        .param("notes", "Another game night"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.reservationDate").exists())
+                .andExpect(jsonPath("$.participantCount").value(3))
                 .andExpect(jsonPath("$.notes").value("Another game night"));
     }
 
     @Test
     void createReservation_Unauthorized_ShouldReturn403() throws Exception {
-        Reservation newReservation = new Reservation(testUser, testGame, LocalDate.now().plusDays(7), 3, "No access");
-
         mockMvc.perform(post("/api/reservations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newReservation)))
+                        .param("customerId", testUser.getId().toString())
+                        .param("boardgameId", testGame.getId().toString())
+                        .param("reservationDate", LocalDate.now().plusDays(7).toString())
+                        .param("participantCount", "3")
+                        .param("notes", "No access"))
                 .andExpect(status().isForbidden());
     }
 
@@ -125,5 +135,65 @@ class ReservationControllerIT {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    @WithMockUser
+    void getReservationsByBoardgame_ShouldReturnList() throws Exception {
+        mockMvc.perform(get("/api/reservations/boardgame/" + testGame.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].reservationDate").exists())
+                .andExpect(jsonPath("$[0].participantCount").value(4))
+                .andExpect(jsonPath("$[0].notes").value("Game night!"));
+    }
+
+    @Test
+    @WithMockUser
+    void getReservationsByBoardgame_NonExisting_ShouldReturnEmptyList() throws Exception {
+        mockMvc.perform(get("/api/reservations/boardgame/999"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    @WithMockUser
+    void getReservationsByCustomer_NonExisting_ShouldReturnEmptyList() throws Exception {
+        mockMvc.perform(get("/api/reservations/customer/999"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    @WithMockUser(roles = "CUSTOMER")
+    void createReservation_WithMissingParameters_ShouldReturn400() throws Exception {
+        mockMvc.perform(post("/api/reservations")
+                        .param("customerId", testUser.getId().toString())
+                        .param("boardgameId", testGame.getId().toString())
+                        .param("reservationDate", LocalDate.now().plusDays(7).toString()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "CUSTOMER")
+    void createReservation_WithInvalidDate_ShouldReturn400() throws Exception {
+        mockMvc.perform(post("/api/reservations")
+                        .param("customerId", testUser.getId().toString())
+                        .param("boardgameId", testGame.getId().toString())
+                        .param("reservationDate", "invalid-date")
+                        .param("participantCount", "3"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "CUSTOMER")
+    void createReservation_WithInvalidParticipantCount_ShouldReturn400() throws Exception {
+        mockMvc.perform(post("/api/reservations")
+                        .param("customerId", testUser.getId().toString())
+                        .param("boardgameId", testGame.getId().toString())
+                        .param("reservationDate", LocalDate.now().plusDays(7).toString())
+                        .param("participantCount", "0"))
+                .andExpect(status().isBadRequest());
+    }
 
 }

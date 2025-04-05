@@ -1,7 +1,6 @@
 package com.meepleconnect.boardgamesapi.services;
 
 import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
-import com.meepleconnect.boardgamesapi.exceptions.ReservationNotFoundException;
 import com.meepleconnect.boardgamesapi.models.Boardgame;
 import com.meepleconnect.boardgamesapi.models.Reservation;
 import com.meepleconnect.boardgamesapi.models.User;
@@ -22,7 +21,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class ReservationServiceTest {
+public class ReservationServiceTest {
 
     @Mock
     private ReservationRepository reservationRepository;
@@ -79,11 +78,10 @@ class ReservationServiceTest {
     void testGetReservationByCustomer_Failure() {
         when(reservationRepository.findByCustomerId(1L)).thenReturn(Collections.emptyList());
 
-        assertThrows(ReservationNotFoundException.class, () -> reservationService.getReservationsByCustomer(1L));
-
+        var result = reservationService.getReservationsByCustomer(1L);
+        assertTrue(result.isEmpty());
         verify(reservationRepository, times(1)).findByCustomerId(1L);
     }
-
 
     @Test
     void testGetReservationsByBoardgame_Success() {
@@ -97,7 +95,9 @@ class ReservationServiceTest {
     @Test
     void testGetReservationsByBoardgame_Failure() {
         when(reservationRepository.findByBoardgameId(1L)).thenReturn(Collections.emptyList());
-        assertThrows(ReservationNotFoundException.class, () -> reservationService.getReservationsByBoardgame(1L));
+
+        var result = reservationService.getReservationsByBoardgame(1L);
+        assertTrue(result.isEmpty());
         verify(reservationRepository, times(1)).findByBoardgameId(1L);
     }
 
@@ -135,6 +135,7 @@ class ReservationServiceTest {
         assertEquals(0, reservationRepository.findAll().size());
         verify(reservationRepository, times(1)).deleteById(1L);
     }
+
     @Test
     void testCancelReservation_Failure() {
         when(reservationRepository.existsById(1L)).thenReturn(false);

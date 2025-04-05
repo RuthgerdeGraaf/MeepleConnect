@@ -1,9 +1,11 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
+import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
 import com.meepleconnect.boardgamesapi.models.Reservation;
 import com.meepleconnect.boardgamesapi.services.ReservationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -38,20 +40,37 @@ public class ReservationController {
     @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
     public ResponseEntity<Reservation> createReservation(
-            @RequestParam Long customerId,
-            @RequestParam Long boardgameId,
-            @RequestParam String reservationDate,
-            @RequestParam int participantCount,
+            @RequestParam(required = true) Long customerId,
+            @RequestParam(required = true) Long boardgameId,
+            @RequestParam(required = true) String reservationDate,
+            @RequestParam(required = true) int participantCount,
             @RequestParam(required = false) String notes) {
 
-        LocalDate date = LocalDate.parse(reservationDate);
-        return ResponseEntity.ok(reservationService.createReservation(customerId, boardgameId, date, participantCount, notes));
+        if (participantCount <= 0) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        try {
+            LocalDate date = LocalDate.parse(reservationDate);
+            return ResponseEntity.ok(reservationService.createReservation(customerId, boardgameId, date, participantCount, notes));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Void> handleMissingParameter(MissingServletRequestParameterException ex) {
+        return ResponseEntity.badRequest().build();
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<Void> cancelReservation(@PathVariable Long reservationId) {
-        reservationService.cancelReservation(reservationId);
-        return ResponseEntity.noContent().build();
+        try {
+            reservationService.cancelReservation(reservationId);
+            return ResponseEntity.noContent().build();
+        } catch (GameNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

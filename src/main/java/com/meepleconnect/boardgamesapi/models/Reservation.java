@@ -1,5 +1,6 @@
 package com.meepleconnect.boardgamesapi.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -12,10 +13,12 @@ public class Reservation {
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnore
     private User customer;
 
     @ManyToOne
     @JoinColumn(name = "boardgame_id", nullable = false)
+    @JsonIgnore
     private Boardgame boardgame;
 
     private LocalDate reservationDate;

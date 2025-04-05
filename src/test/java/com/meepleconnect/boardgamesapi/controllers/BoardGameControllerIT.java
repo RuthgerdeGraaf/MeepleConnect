@@ -14,7 +14,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class BoardgameControllerIT {
+public class BoardGameControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,6 +45,7 @@ class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser
     void getAllBoardgames_ShouldReturnList() throws Exception {
         String jsonResponse = mockMvc.perform(get("/api/boardgames"))
                 .andExpect(status().isOk())
@@ -58,8 +59,8 @@ class BoardgameControllerIT {
         assertEquals("Catan", boardgames.get(0).getName());
     }
 
-
-            @Test
+    @Test
+    @WithMockUser
     void getBoardgameById_ShouldReturnGame() throws Exception {
         mockMvc.perform(get("/api/boardgames/" + testGame.getId()))
                 .andExpect(status().isOk())
@@ -67,6 +68,7 @@ class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser
     void getBoardgameById_NonExisting_ShouldReturn404() throws Exception {
         mockMvc.perform(get("/api/boardgames/999"))
                 .andExpect(status().isNotFound());
@@ -140,12 +142,14 @@ class BoardgameControllerIT {
     @Test
     @WithMockUser
     void getSpecialBoardgame_ShouldReturnTeapotException() throws Exception {
-        mockMvc.perform(get("/api/boardgames/418"))
+        mockMvc.perform(get("/api/fun/boardgames/418"))
             .andExpect(status().isIAmATeapot())
             .andExpect(jsonPath("$.error").value("I'm a teapot"))
             .andExpect(jsonPath("$.message").value("Dit bordspel is een theepot!"));
     }
+
     @Test
+    @WithMockUser
     void getBoardgamesByGenre_ShouldReturnFilteredResults() throws Exception {
         Boardgame strategyGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), true, 1, 5, "Strategy", null);
         Boardgame adventureGame = new Boardgame("Gloomhaven", new BigDecimal("89.99"), true, 1, 4, "Adventure", null);
@@ -164,5 +168,89 @@ class BoardgameControllerIT {
         assertEquals(2, filteredBoardgames.size());
         assertEquals("Catan", filteredBoardgames.get(0).getName());
         assertEquals("Terraforming Mars", filteredBoardgames.get(1).getName());
+    }
+
+    @Test
+    @WithMockUser
+    void getBoardgamesByAvailability_ShouldReturnFilteredResults() throws Exception {
+        Boardgame availableGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), true, 1, 5, "Strategy", null);
+        Boardgame unavailableGame = new Boardgame("Gloomhaven", new BigDecimal("89.99"), false, 1, 4, "Adventure", null);
+        boardgameRepository.save(availableGame);
+        boardgameRepository.save(unavailableGame);
+
+        String jsonResponse = mockMvc.perform(get("/api/boardgames?available=true"))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        List<Boardgame> filteredBoardgames = objectMapper.readValue(jsonResponse, new TypeReference<List<Boardgame>>() {});
+
+        assertFalse(filteredBoardgames.isEmpty());
+        assertEquals(2, filteredBoardgames.size());
+        assertTrue(filteredBoardgames.stream().allMatch(Boardgame::isAvailable));
+    }
+
+    @Test
+    @WithMockUser
+    void getBoardgamesByMinPlayers_ShouldReturnFilteredResults() throws Exception {
+        Boardgame twoPlayerGame = new Boardgame("7 Wonders Duel", new BigDecimal("39.99"), true, 2, 2, "Strategy", null);
+        Boardgame threePlayerGame = new Boardgame("Carcassonne", new BigDecimal("29.99"), true, 2, 5, "Strategy", null);
+        boardgameRepository.save(twoPlayerGame);
+        boardgameRepository.save(threePlayerGame);
+
+        String jsonResponse = mockMvc.perform(get("/api/boardgames?minPlayers=3"))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        List<Boardgame> filteredBoardgames = objectMapper.readValue(jsonResponse, new TypeReference<List<Boardgame>>() {});
+
+        assertFalse(filteredBoardgames.isEmpty());
+        assertEquals(1, filteredBoardgames.size());
+        assertEquals("Catan", filteredBoardgames.get(0).getName());
+    }
+
+    @Test
+    @WithMockUser
+    void getBoardgamesByMaxPlayers_ShouldReturnFilteredResults() throws Exception {
+        Boardgame fourPlayerGame = new Boardgame("Ticket to Ride", new BigDecimal("49.99"), true, 2, 4, "Family", null);
+        Boardgame fivePlayerGame = new Boardgame("Pandemic", new BigDecimal("44.99"), true, 2, 4, "Cooperative", null);
+        boardgameRepository.save(fourPlayerGame);
+        boardgameRepository.save(fivePlayerGame);
+
+        String jsonResponse = mockMvc.perform(get("/api/boardgames?maxPlayers=4"))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        List<Boardgame> filteredBoardgames = objectMapper.readValue(jsonResponse, new TypeReference<List<Boardgame>>() {});
+
+        assertFalse(filteredBoardgames.isEmpty());
+        assertEquals(3, filteredBoardgames.size());
+        assertTrue(filteredBoardgames.stream().allMatch(game -> game.getMaxPlayers() <= 4));
+    }
+
+    @Test
+    @WithMockUser
+    void getBoardgamesByMultipleFilters_ShouldReturnFilteredResults() throws Exception {
+        Boardgame strategyGame = new Boardgame("Terraforming Mars", new BigDecimal("59.99"), true, 1, 5, "Strategy", null);
+        Boardgame adventureGame = new Boardgame("Gloomhaven", new BigDecimal("89.99"), false, 1, 4, "Adventure", null);
+        boardgameRepository.save(strategyGame);
+        boardgameRepository.save(adventureGame);
+
+        String jsonResponse = mockMvc.perform(get("/api/boardgames?genre=Strategy&available=true&minPlayers=2&maxPlayers=4"))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        List<Boardgame> filteredBoardgames = objectMapper.readValue(jsonResponse, new TypeReference<List<Boardgame>>() {});
+
+        assertFalse(filteredBoardgames.isEmpty());
+        assertEquals(1, filteredBoardgames.size());
+        assertEquals("Catan", filteredBoardgames.get(0).getName());
     }
 }
