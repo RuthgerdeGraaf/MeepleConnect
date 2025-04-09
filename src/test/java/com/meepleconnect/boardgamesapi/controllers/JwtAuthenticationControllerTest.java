@@ -58,10 +58,8 @@ public class JwtAuthenticationControllerTest {
 
     @BeforeEach
     void setUp() {
-        // Verwijder bestaande testgebruiker
         userRepository.findByUsername("testuser").ifPresent(userRepository::delete);
 
-        // Maak testgebruiker aan in de database
         User testUser = new User();
         testUser.setUsername("testuser");
         testUser.setPassword(passwordEncoder.encode("password"));
@@ -71,18 +69,14 @@ public class JwtAuthenticationControllerTest {
 
     @Test
     void createAuthenticationToken_ValidCredentials_ShouldReturnJwt() throws Exception {
-        // Arrange
         JwtRequest request = new JwtRequest("testuser", "password");
         String jwtToken = "test.jwt.token";
 
-        // Mock de authenticatie
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(new UsernamePasswordAuthenticationToken("testuser", "password", Collections.emptyList()));
         
-        // Mock de JWT generatie
         when(jwtUtil.generateToken("testuser")).thenReturn(jwtToken);
 
-        // Act & Assert
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -92,14 +86,11 @@ public class JwtAuthenticationControllerTest {
 
     @Test
     void createAuthenticationToken_InvalidCredentials_ShouldReturn401() throws Exception {
-        // Arrange
         JwtRequest request = new JwtRequest("testuser", "wrongpassword");
 
-        // Mock de authenticatie om een AuthenticationException te gooien
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new AuthenticationException("Invalid credentials") {});
 
-        // Act & Assert
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))

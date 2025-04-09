@@ -31,8 +31,6 @@ public class UserProfile {
         this.user = user;
     }
 
-    // Getters en Setters
-
     public Long getId() { return id; }
     public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) { this.firstName = firstName; }

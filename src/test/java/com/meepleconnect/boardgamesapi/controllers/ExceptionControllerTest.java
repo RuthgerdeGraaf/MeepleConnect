@@ -110,7 +110,6 @@ public class ExceptionControllerTest {
 
     @Test
     void handleValidationException_ShouldReturn400() {
-        // Mock MethodArgumentNotValidException
         MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
         BindingResult bindingResult = mock(BindingResult.class);
         when(exception.getBindingResult()).thenReturn(bindingResult);
