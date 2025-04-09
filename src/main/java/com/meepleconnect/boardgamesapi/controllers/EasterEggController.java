@@ -20,7 +20,7 @@ public class EasterEggController {
     @GetMapping("/boardgames/{id}")
     public ResponseEntity<String> getBoardgameTeapot(@PathVariable Long id) {
         if (id == 418) {
-            throw new TeapotException("Dit bordspel is een theepot!");
+            throw new TeapotException("This boardgame is a teapot!");
         }
         return ResponseEntity.notFound().build();
     }

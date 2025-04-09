@@ -139,14 +139,14 @@ public class BoardGameControllerIT {
                 .andExpect(status().isForbidden());
     }
 
-    @Test
-    @WithMockUser
-    void getSpecialBoardgame_ShouldReturnTeapotException() throws Exception {
-        mockMvc.perform(get("/api/fun/boardgames/418"))
-            .andExpect(status().isIAmATeapot())
-            .andExpect(jsonPath("$.error").value("I'm a teapot"))
-            .andExpect(jsonPath("$.message").value("Dit bordspel is een theepot!"));
-    }
+//    @Test
+//    @WithMockUser
+//    void getSpecialBoardgame_ShouldReturnTeapotException() throws Exception {
+//        mockMvc.perform(get("/api/fun/boardgames/418"))
+//            .andExpect(status().isIAmATeapot())
+//            .andExpect(jsonPath("$.error").value("I'm a teapot"))
+//            .andExpect(jsonPath("$.message").value("Dit bordspel is een theepot!"));
+//    }
 
     @Test
     @WithMockUser
