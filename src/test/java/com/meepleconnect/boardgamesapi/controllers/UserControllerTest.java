@@ -42,7 +42,6 @@ public class UserControllerTest {
     @Test
     @WithMockUser(roles = {"EMPLOYEE"})
     void testRegisterUser_Success() throws Exception {
-        // Arrange
         User user = new User();
         user.setUsername("testuser");
         user.setPassword("password");
@@ -53,7 +52,6 @@ public class UserControllerTest {
 
         when(userService.registerUser(any(User.class))).thenReturn(savedUser);
 
-        // Act & Assert
         mockMvc.perform(post("/api/users/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user)))
@@ -67,20 +65,18 @@ public class UserControllerTest {
     @Test
     @WithMockUser(roles = {"EMPLOYEE"})
     void testRegisterUser_Failure() throws Exception {
-        // Arrange
         User user = new User();
         user.setUsername("testuser");
         user.setPassword("password");
 
         when(userService.registerUser(any(User.class)))
-            .thenThrow(new RuntimeException("Registratiefout"));
+            .thenThrow(new RuntimeException("Registration error"));
 
-        // Act & Assert
         mockMvc.perform(post("/api/users/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Fout bij registratie: Registratiefout"));
+                .andExpect(content().string("Error by registration: Registration error"));
 
         verify(userService, times(1)).registerUser(any(User.class));
     }
@@ -88,7 +84,6 @@ public class UserControllerTest {
     @Test
     @WithMockUser(roles = {"EMPLOYEE"})
     void testGetUserById_Success() throws Exception {
-        // Arrange
         User user = new User();
         user.setId(1L);
         user.setUsername("testuser");
@@ -96,7 +91,6 @@ public class UserControllerTest {
 
         when(userService.getUserById(1L)).thenReturn(Optional.of(user));
 
-        // Act & Assert
         mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
@@ -108,10 +102,8 @@ public class UserControllerTest {
     @Test
     @WithMockUser(roles = {"EMPLOYEE"})
     void testGetUserById_NotFound() throws Exception {
-        // Arrange
         when(userService.getUserById(1L)).thenReturn(Optional.empty());
 
-        // Act & Assert
         mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isNotFound());
 
@@ -121,10 +113,8 @@ public class UserControllerTest {
     @Test
     @WithMockUser(roles = {"EMPLOYEE"})
     void testDeleteUser_Success() throws Exception {
-        // Arrange
         doNothing().when(userService).deleteUser(1L);
 
-        // Act & Assert
         mockMvc.perform(delete("/api/users/1"))
                 .andExpect(status().isNoContent());
 

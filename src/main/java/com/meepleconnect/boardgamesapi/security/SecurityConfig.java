@@ -29,8 +29,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/login").permitAll() // Sta login endpoint toe
-                .requestMatchers("/api/auth/**", "/actuator/**").permitAll() // Sta actuator endpoints toe
+                .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/**", "/actuator/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

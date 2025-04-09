@@ -41,13 +41,7 @@ VALUES
     ('Kosmos', 'Germany', '1822', false),
     ('Rio Grande Games', 'United States', '1998', false);
 
--- INSERT INTO boardgames (name, price, minPlayers, maxPlayers, genre, available, publisher)
--- VALUES
---     ('Mansions of Madness', 99.99, 1, 5, 'Horror', true, (SELECT id FROM publisher WHERE name = 'Fantasy Flight Games')),
---     ('Betrayal at House on the Hill', 49.99, 3, 6, 'Horror', true, (SELECT id FROM publisher WHERE name = 'Avalon Hill'));
-
-    -- Voeg andere spellen hier toe
-INSERT INTO users (username, password, role) 
+INSERT INTO users (username, password, role)
 VALUES
     ('Ruthger', '$2a$12$IOfGkBw8cRrqz3NamrHG4O9FTXsPQ8Bo2/lNutMcitWIBzn1.Chj2', 'ADMIN'),
     ('Jeroen', '$2a$12$Ap0HvB1RO19eSOD7DtBtheFrbkVdxa0haEhz30W2lOGbFVyaubsmO', 'USER'),
@@ -55,13 +49,3 @@ VALUES
     ('Jip', '$2a$12$PocIYxXiNXSEX7Ggq0kynOF4ikO5e5oGaw4j/9tJP2hJx9Qlsw9oe', 'USER'),
     ('Janneke', '$2a$12$UTkb3xb9AUGLUeCgnww6F.HWvsFZcklVMeOv7TRMjwpG/uWxFmJ6.', 'ADMIN');
 
--- INSERT INTO reservations (customer_id, boardgame_id, reservation_date, participant_count, notes) 
--- VALUES
---     ((SELECT id FROM users WHERE username = 'Ruthger'), (SELECT id FROM boardgames WHERE name = 'Mansions of Madness'), '2025-06-01', 5, 'Game night!');
---     -- ((SELECT id FROM users WHERE username = 'Jeroen'), (SELECT id FROM boardgames WHERE name = 'Mansions of Madness'), '2025-06-01', 5, 'Game night!'),
---     -- ((SELECT id FROM users WHERE username = 'Margriet'), (SELECT id FROM boardgames WHERE name = 'Mansions of Madness'), '2025-06-01', 5, 'Game night!'),
---     -- ((SELECT id FROM users WHERE username = 'Jip'), (SELECT id FROM boardgames WHERE name = 'Mansions of Madness'), '2025-06-01', 5, 'Game night!'),
---     -- ((SELECT id FROM users WHERE username = 'Janneke'), (SELECT id FROM boardgames WHERE name = 'Mansions of Madness'), '2025-06-01', 5, 'Game night!'),
---     -- ((SELECT id FROM users WHERE username = 'Ruthger'), (SELECT id FROM boardgames WHERE name = 'Who Goes There'), '2025-03-13', 3, 'Payback!'),
---     -- ((SELECT id FROM users WHERE username = 'Janneke'), (SELECT id FROM boardgames WHERE name = 'Who Goes There'), '2025-03-13', 3, 'Payback!'), 
---     -- ((SELECT id FROM users WHERE username = 'Jip'), (SELECT id FROM boardgames WHERE name = 'Who Goes There'), '2025-03-13', 3, 'Payback!');
