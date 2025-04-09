@@ -39,7 +39,7 @@ public class BoardgameService {
         
         Optional<Boardgame> existingBoardgame = boardgameRepository.findByNameIgnoreCase(boardgame.getName());
         if (existingBoardgame.isPresent()) {
-            throw new ConflictException("Bordspel met de naam '" + boardgame.getName() + "' bestaat al.");
+            throw new ConflictException("Boardagme with name '" + boardgame.getName() + "' already exists.");
         }
         return boardgameRepository.save(boardgame);
     }
@@ -72,7 +72,7 @@ public class BoardgameService {
     
     public Boardgame getSpecialBoardgame(int id) {
     if (id == 418) {
-        throw new TeapotException("Dit boardgame is a teapot!");
+        throw new TeapotException("This boardgame is a teapot!");
     }
     Long i = (long) id;
         return boardgameRepository.findById(i)

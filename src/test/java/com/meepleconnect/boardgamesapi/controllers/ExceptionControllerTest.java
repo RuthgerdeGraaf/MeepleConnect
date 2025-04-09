@@ -33,24 +33,24 @@ public class ExceptionControllerTest {
 
     @Test
     void handleGameNotFoundException_ShouldReturn404() {
-        GameNotFoundException exception = new GameNotFoundException("Bordspel niet gevonden");
+        GameNotFoundException exception = new GameNotFoundException("Boardgame not found");
 
         ResponseEntity<Object> response = exceptionController.handleGameNotFoundException(exception);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody(), "Response body should not be null");
-        assertTrue(response.getBody().toString().contains("Bordspel niet gevonden"));
+        assertTrue(response.getBody().toString().contains("Boardgame not found"));
     }
 
     @Test
     void handleGlobalException_ShouldReturn500() {
-        Exception exception = new Exception("Onverwachte fout");
+        Exception exception = new Exception("Unexpected error");
 
         ResponseEntity<Object> response = exceptionController.handleGlobalException(exception);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody(), "Response body should not be null");
-        assertTrue(response.getBody().toString().contains("Onverwachte fout"));
+        assertTrue(response.getBody().toString().contains("Unexpected error"));
     }
 
     @Test
@@ -66,35 +66,35 @@ public class ExceptionControllerTest {
 
     @Test
     void handleIllegalArgumentException_ShouldReturn400() {
-        IllegalArgumentException exception = new IllegalArgumentException("Ongeldig argument");
+        IllegalArgumentException exception = new IllegalArgumentException("Invalid argument");
 
         ResponseEntity<Object> response = exceptionController.handleIllegalArgumentException(exception);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody(), "Response body should not be null");
-        assertTrue(response.getBody().toString().contains("Ongeldig argument"));
+        assertTrue(response.getBody().toString().contains("Invalid argument"));
     }
 
     @Test
     void handleIndexOutOfBoundsException_ShouldReturn404() {
-        IndexOutOfBoundsException exception = new IndexOutOfBoundsException("Index buiten bereik");
+        IndexOutOfBoundsException exception = new IndexOutOfBoundsException("Index out of bounds");
 
         ResponseEntity<Object> response = exceptionController.handleIndexOutOfBoundsException(exception);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody(), "Response body should not be null");
-        assertTrue(response.getBody().toString().contains("Index buiten bereik"));
+        assertTrue(response.getBody().toString().contains("Index out of bounds"));
     }
 
     @Test
     void handleConflictException_ShouldReturn409() {
-        ConflictException exception = new ConflictException("Conflict opgetreden");
+        ConflictException exception = new ConflictException("Conflict occurred");
 
         ResponseEntity<Object> response = exceptionController.handleConflictException(exception);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertNotNull(response.getBody(), "Response body should not be null");
-        assertTrue(response.getBody().toString().contains("Conflict opgetreden"));
+        assertTrue(response.getBody().toString().contains("Conflict occurred"));
     }
 
     @Test

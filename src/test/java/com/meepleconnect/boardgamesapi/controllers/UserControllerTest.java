@@ -70,13 +70,13 @@ public class UserControllerTest {
         user.setPassword("password");
 
         when(userService.registerUser(any(User.class)))
-            .thenThrow(new RuntimeException("Registratiefout"));
+            .thenThrow(new RuntimeException("Registration error"));
 
         mockMvc.perform(post("/api/users/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Fout bij registratie: Registratiefout"));
+                .andExpect(content().string("Error by registration: Registration error"));
 
         verify(userService, times(1)).registerUser(any(User.class));
     }

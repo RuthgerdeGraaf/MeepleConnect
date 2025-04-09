@@ -25,7 +25,7 @@ public class UserController {
             User registeredUser = userService.registerUser(user);
             return ResponseEntity.ok(registeredUser);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Fout bij registratie: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error by registration: " + e.getMessage());
         }
     }
 
