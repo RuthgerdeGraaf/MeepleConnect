@@ -30,7 +30,6 @@ public class BoardgameController {
         return boardgameService.getFilteredBoardgames(genre, available, minPlayers, maxPlayers);
     }
     
-
     @GetMapping("/{id}")
     public ResponseEntity<Boardgame> getBoardgameById(@PathVariable Long id) {
         return ResponseEntity.ok(boardgameService.getBoardgameById(id));

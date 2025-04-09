@@ -13,7 +13,7 @@ import static org.mockito.Mockito.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserServiceTest {
+public class UserServiceTest {
 
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
