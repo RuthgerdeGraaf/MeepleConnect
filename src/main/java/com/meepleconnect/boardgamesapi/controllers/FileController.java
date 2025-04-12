@@ -49,7 +49,7 @@ public class FileController {
 
             return ResponseEntity.ok(newFilename);
         } catch (IOException e) {
-            return ResponseEntity.internalServerError().body("Kon bestand niet uploaden: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Could not upload file: " + e.getMessage());
         }
     }
 

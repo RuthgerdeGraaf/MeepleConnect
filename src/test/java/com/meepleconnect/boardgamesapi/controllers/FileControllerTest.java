@@ -61,7 +61,7 @@ public class FileControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/files/upload")
                 .file(file))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Bestand is leeg"));
+                .andExpect(content().string("File is empty"));
     }
 
     @Test
