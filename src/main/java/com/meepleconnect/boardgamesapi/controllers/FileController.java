@@ -37,7 +37,7 @@ public class FileController {
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body("Bestand is leeg");
+                return ResponseEntity.badRequest().body("File is empty");
             }
 
             String originalFilename = file.getOriginalFilename();
