@@ -12,22 +12,37 @@
 
 ## **1. Introduction**
 
-**MeepleConnect** is a web API designed for board game stores, enabling customers to reserve board games for play sessions or express interest in purchasing. Staff can manage the game inventory, schedule play sessions, and handle customer reservations.
+**MeepleConnect** is a web API specifically designed for board game stores. The system offers the following core functionalities:
+
+- **Customers** can:
+  - View and reserve board games for play sessions
+  - Express interest in purchasing games
+  - Manage their own reservations
+
+- **Staff** can:
+  - Manage the board game inventory
+  - Schedule play sessions
+  - Process reservations
+  - Manage customer data
 
 **Technologies Used:**
-- **Java 17**
-- **Spring Boot**
-- **Spring Security**
-- **JWT Authentication**
-- **PostgreSQL** (or other relational databases via JPA)
-- **Lombok** & **MapStruct** (for code optimization)
-- **Postman** (for API testing)
+- **Backend:**
+  - Java 17
+  - Spring Boot (version 3.x)
+  - Spring Security with JWT authentication
+  - PostgreSQL (or other relational databases via JPA)
+  - Lombok & MapStruct for code optimization
+
+- **Testing & Development:**
+  - Postman for API testing
+  - Maven for dependency management
+  - Git for version control
 
 ---
 
 ## **2. Prerequisites**
 
-Ensure the following tools are installed on your system:
+Ensure that the following tools are installed on your system:
 
 - **Java 17** (or higher)
 - **Maven** (for dependency management)
@@ -50,7 +65,7 @@ cd MeepleConnect
    ```sql
    CREATE DATABASE meepleconnect;
    ```
-2. Update database credentials in `application.properties`:
+2. Update databasereferenties in `application.properties`:
    ```properties
    spring.datasource.url=jdbc:postgresql://localhost:5432/meepleconnect
    spring.datasource.username=postgres
@@ -81,21 +96,21 @@ http://localhost:8080
 | admin        | admin123     | EMPLOYEE    |
 | klant1       | klant123     | CUSTOMER    |
 
-- **EMPLOYEE** → Can manage games, schedule sessions, and handle reservations.
-- **CUSTOMER** → Can view games, make reservations, and express purchase interest.
+- **EMPLOYEE** → Can manage games, play sessions, and reservations.
+- **CUSTOMER** → Can view games, make reservations, and express interest in purchasing.
 
 ---
 
 ## **5. Postman Collection**
 
-The **Postman collection** includes all major API requests:
+The **Postman collection** contains all important API requests:
 
-1. **Login Endpoint** → Generates JWT token
-2. **CRUD Operations for Board Games**
+1. **Login Endpoint** → Generates JWT-token
+2. **CRUD operations for Board Games**
 3. **Manage Reservations**
 4. **Schedule Play Sessions**
 
-➡️ **Import the provided Postman collection ([MeepleConnect.postman_collection.json](./MeepleConnect.postman_collection.json)) into Postman.**
+➡️ **Import the provided Postman collection ([MeepleConnect.postman_collection.json](./MeepleConnect.postman_collection.json)) in Postman.**
 
 ---
 
@@ -111,6 +126,8 @@ The **Postman collection** includes all major API requests:
 }
 ```
 ➡️ **Response:** JWT token
+
+This is the endpoint used to authenticate users and generate a JWT token. The token is required for subsequent requests to protected endpoints.
 
 ---
 
@@ -128,9 +145,9 @@ The **Postman collection** includes all major API requests:
 }
 ```
 
-**PUT** `/api/boardgames/{id}` → Update a board game
+**PUT** `/api/boardgames/{id}` → Update a board game *(EMPLOYEE only)*
 
-**DELETE** `/api/boardgames/{id}` → Delete a board game
+**DELETE** `/api/boardgames/{id}` → Delete a board game *(EMPLOYEE only)*
 
 ---
 
@@ -146,12 +163,40 @@ The **Postman collection** includes all major API requests:
 
 **GET** `/api/reservations/customer/{customerId}` → Retrieve all reservations for a customer
 
-**DELETE** `/api/reservations/{reservationId}` → Delete a reservation
+**DELETE** `/api/reservations/{reservationId}` → Delete a reservation *(CUSTOMER for own reservations, EMPLOYEE for all)*
 
 ---
 
 ### 📄 **Endpoint Security:**
+
 - **JWT Authentication** → Required for all endpoints except `/api/auth/login`.
-- **Roles:**
-  - **EMPLOYEE** → Full CRUD capabilities
-  - **CUSTOMER** → Access only to their own reservations
+- Once the user logs in and receives the JWT token, it must be included in the Authorization header for subsequent requests.
+
+**Roles:**
+- **EMPLOYEE** → Full CRUD capabilities (Board Games, Play Sessions, Reservations)
+- **CUSTOMER** → Access only to their own reservations and limited CRUD capabilities
+
+**JWT Authentication Process:**
+1. **Login:** A user logs in using the `/api/auth/login` endpoint with valid credentials (username and password). If successful, the server responds with a JWT token.
+2. **Token Usage:** The received JWT token must be included in the Authorization header as a Bearer token in all subsequent requests to protected endpoints.
+3. **Role-based Access:**
+   - **EMPLOYEE:** Can perform full CRUD operations on board games, schedule play sessions, and manage reservations
+   - **CUSTOMER:** Can make reservations and view their own reservations. They cannot manage board games or schedule play sessions
+4. **Request with JWT token:** Each protected endpoint checks the validity of the token and ensures the user has the appropriate role for the action
+
+**Example of a protected request with JWT token:**
+
+**POST** `/api/boardgames`
+```json
+{
+  "name": "Catan",
+  "genre": "Strategy",
+  "players": 4,
+  "price": 29.99
+}
+```
+
+**Header:**
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.S7J5KHkl_-Cj0w8rJ0yHnp1lmUQd7-TtdR6qZ-hOocI4
+```

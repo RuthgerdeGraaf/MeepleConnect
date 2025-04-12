@@ -3,6 +3,7 @@ package com.meepleconnect.boardgamesapi;
 import com.meepleconnect.boardgamesapi.controllers.BoardGameControllerIT;
 import com.meepleconnect.boardgamesapi.controllers.EasterEggControllerTest;
 import com.meepleconnect.boardgamesapi.controllers.ExceptionControllerTest;
+import com.meepleconnect.boardgamesapi.controllers.FileControllerTest;
 import com.meepleconnect.boardgamesapi.controllers.JwtAuthenticationControllerTest;
 import com.meepleconnect.boardgamesapi.controllers.PublisherControllerIT;
 import com.meepleconnect.boardgamesapi.controllers.ReservationControllerIT;
@@ -18,6 +19,7 @@ import org.junit.platform.suite.api.Suite;
     BoardGameControllerIT.class,
     EasterEggControllerTest.class,
     ExceptionControllerTest.class,
+    FileControllerTest.class,
     JwtAuthenticationControllerTest.class,
     PublisherControllerIT.class,
     ReservationControllerIT.class,
