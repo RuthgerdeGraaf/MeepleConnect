@@ -9,6 +9,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class FileControllerTest {
 
     @Autowired
@@ -36,27 +38,26 @@ public class FileControllerTest {
     @WithMockUser(roles = "EMPLOYEE")
     void uploadFile_Success() throws Exception {
         MockMultipartFile file = new MockMultipartFile(
-            "file",
-            "test.txt",
-            "text/plain",
-            "Hello, World!".getBytes()
-        );
+                "file",
+                "test.txt",
+                "text/plain",
+                "Hello, World!".getBytes());
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/files/upload")
                 .file(file))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.matchesPattern("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.txt$")));
+                .andExpect(content().string(org.hamcrest.Matchers
+                        .matchesPattern("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.txt$")));
     }
 
     @Test
     @WithMockUser(roles = "EMPLOYEE")
     void uploadFile_EmptyFile() throws Exception {
         MockMultipartFile file = new MockMultipartFile(
-            "file",
-            "empty.txt",
-            "text/plain",
-            new byte[0]
-        );
+                "file",
+                "empty.txt",
+                "text/plain",
+                new byte[0]);
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/files/upload")
                 .file(file))
@@ -68,11 +69,10 @@ public class FileControllerTest {
     @WithMockUser(roles = "CUSTOMER")
     void uploadFile_Unauthorized() throws Exception {
         MockMultipartFile file = new MockMultipartFile(
-            "file",
-            "test.txt",
-            "text/plain",
-            "Hello, World!".getBytes()
-        );
+                "file",
+                "test.txt",
+                "text/plain",
+                "Hello, World!".getBytes());
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/files/upload")
                 .file(file))
@@ -84,11 +84,10 @@ public class FileControllerTest {
     void uploadAndDownloadFile_Success() throws Exception {
         // Upload een bestand
         MockMultipartFile file = new MockMultipartFile(
-            "file",
-            "test.txt",
-            "text/plain",
-            "Hello, World!".getBytes()
-        );
+                "file",
+                "test.txt",
+                "text/plain",
+                "Hello, World!".getBytes());
 
         String filename = mockMvc.perform(MockMvcRequestBuilders.multipart("/api/files/upload")
                 .file(file))
@@ -109,4 +108,4 @@ public class FileControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/files/download/nonexistent.txt"))
                 .andExpect(status().isNotFound());
     }
-} 
+}

@@ -11,11 +11,11 @@ import javax.crypto.SecretKey;
 
 import org.springframework.stereotype.Component;
 
-
 @Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "rowaniseenheldhijheeftsupergeholpendankjewel";
+    // Een geldige BASE64 string (minimaal 256 bits voor HS256)
+    private static final String SECRET_KEY = "cm93YW5pc2VlbmhlbGRoaWpoZWVmdHN1cGVyZ2Vob2xwZW5kYW5ranVlbA==";
 
     public String generateToken(String username) {
         return Jwts.builder()

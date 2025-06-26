@@ -20,7 +20,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -33,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class JwtAuthenticationControllerTest {
 
     @Autowired
@@ -58,8 +61,10 @@ public class JwtAuthenticationControllerTest {
 
     @BeforeEach
     void setUp() {
+        // Clean up any existing test user
         userRepository.findByUsername("testuser").ifPresent(userRepository::delete);
 
+        // Create a test user
         User testUser = new User();
         testUser.setUsername("testuser");
         testUser.setPassword(passwordEncoder.encode("password"));
@@ -74,12 +79,12 @@ public class JwtAuthenticationControllerTest {
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(new UsernamePasswordAuthenticationToken("testuser", "password", Collections.emptyList()));
-        
+
         when(jwtUtil.generateToken("testuser")).thenReturn(jwtToken);
 
         mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value(jwtToken));
     }
@@ -89,11 +94,12 @@ public class JwtAuthenticationControllerTest {
         JwtRequest request = new JwtRequest("testuser", "wrongpassword");
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new AuthenticationException("Invalid credentials") {});
+                .thenThrow(new AuthenticationException("Invalid credentials") {
+                });
 
         mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());
     }
-} 
+}
