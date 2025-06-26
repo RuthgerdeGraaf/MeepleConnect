@@ -4,7 +4,6 @@ import com.meepleconnect.boardgamesapi.models.User;
 import com.meepleconnect.boardgamesapi.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -29,7 +28,6 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE') or #id == authentication.principal.id")
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         Optional<User> user = userService.getUserById(id);
@@ -37,7 +35,6 @@ public class UserController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);

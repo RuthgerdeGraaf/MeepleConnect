@@ -4,7 +4,6 @@ import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
 import com.meepleconnect.boardgamesapi.models.Reservation;
 import com.meepleconnect.boardgamesapi.services.ReservationService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +20,6 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE')")
     @GetMapping
     public List<Reservation> getAllReservations() {
         return reservationService.getAllReservations();
@@ -37,7 +35,6 @@ public class ReservationController {
         return reservationService.getReservationsByBoardgame(boardgameId);
     }
 
-    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
     public ResponseEntity<Reservation> createReservation(
             @RequestParam(required = true) Long customerId,
@@ -52,7 +49,8 @@ public class ReservationController {
 
         try {
             LocalDate date = LocalDate.parse(reservationDate);
-            return ResponseEntity.ok(reservationService.createReservation(customerId, boardgameId, date, participantCount, notes));
+            return ResponseEntity
+                    .ok(reservationService.createReservation(customerId, boardgameId, date, participantCount, notes));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -63,7 +61,6 @@ public class ReservationController {
         return ResponseEntity.badRequest().build();
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE')")
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<Void> cancelReservation(@PathVariable Long reservationId) {
         try {
