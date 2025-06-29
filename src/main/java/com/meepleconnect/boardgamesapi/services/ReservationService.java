@@ -4,7 +4,7 @@ import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
 import com.meepleconnect.boardgamesapi.exceptions.ReservationNotFoundException;
 import com.meepleconnect.boardgamesapi.models.Reservation;
 import com.meepleconnect.boardgamesapi.models.Boardgame;
-import com.meepleconnect.boardgamesapi.models.User;
+import com.meepleconnect.boardgamesapi.entities.User;
 import com.meepleconnect.boardgamesapi.repositories.ReservationRepository;
 import com.meepleconnect.boardgamesapi.repositories.BoardgameRepository;
 import com.meepleconnect.boardgamesapi.repositories.UserRepository;
@@ -21,7 +21,8 @@ public class ReservationService {
     private final BoardgameRepository boardgameRepository;
     private final UserRepository userRepository;
 
-    public ReservationService(ReservationRepository reservationRepository, BoardgameRepository boardgameRepository, UserRepository userRepository) {
+    public ReservationService(ReservationRepository reservationRepository, BoardgameRepository boardgameRepository,
+            UserRepository userRepository) {
         this.reservationRepository = reservationRepository;
         this.boardgameRepository = boardgameRepository;
         this.userRepository = userRepository;
@@ -39,7 +40,8 @@ public class ReservationService {
         return reservationRepository.findByBoardgameId(boardgameId);
     }
 
-    public Reservation createReservation(Long customerId, Long boardgameId, LocalDate reservationDate, int participantCount, String notes) {
+    public Reservation createReservation(Long customerId, Long boardgameId, LocalDate reservationDate,
+            int participantCount, String notes) {
         Optional<User> customer = userRepository.findById(customerId);
         Optional<Boardgame> boardgame = boardgameRepository.findById(boardgameId);
 
@@ -51,7 +53,8 @@ public class ReservationService {
             throw new GameNotFoundException("Boardgame with ID " + boardgameId + " wasn't found.");
         }
 
-        Reservation reservation = new Reservation(customer.get(), boardgame.get(), reservationDate, participantCount, notes);
+        Reservation reservation = new Reservation(customer.get(), boardgame.get(), reservationDate, participantCount,
+                notes);
         return reservationRepository.save(reservation);
     }
 

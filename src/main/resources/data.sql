@@ -41,13 +41,19 @@ VALUES
     ('Kosmos', 'Germany', '1822', false),
     ('Rio Grande Games', 'United States', '1998', false);
 
-INSERT INTO users (username, password, role)
-VALUES
-    ('Ruthger', '$2a$10$sKpAnHDMHNs7SLkjT/LXOO0oTZemhIW4.cQmiRXkpsQenMCE8IphS', 'ADMIN'),
-    ('Jeroen', '$2a$10$nmQgx8.6sIMAALT6iQzftePCChR9thyX2tSo9YAWJ/hm8PKa0FOVm', 'USER'),
-    ('Margriet', '$2a$10$nmQgx8.6sIMAALT6iQzftePCChR9thyX2tSo9YAWJ/hm8PKa0FOVm', 'USER'),
-    ('Jip', '$2a$10$nmQgx8.6sIMAALT6iQzftePCChR9thyX2tSo9YAWJ/hm8PKa0FOVm', 'USER'),
-    ('Janneke', '$2a$10$sKpAnHDMHNs7SLkjT/LXOO0oTZemhIW4.cQmiRXkpsQenMCE8IphS', 'ADMIN'),
-    ('employee1', '$2a$10$sKpAnHDMHNs7SLkjT/LXOO0oTZemhIW4.cQmiRXkpsQenMCE8IphS', 'EMPLOYEE'),
-    ('customer1', '$2a$10$nmQgx8.6sIMAALT6iQzftePCChR9thyX2tSo9YAWJ/hm8PKa0FOVm', 'CUSTOMER');
+-- Insert roles for the new entity structure
+INSERT INTO roles (active, description, role_name) VALUES (true, 'administrator roles', 'ROLE_ADMIN');
+INSERT INTO roles (active, description, role_name) VALUES (true, 'user roles', 'ROLE_USER');
+
+-- Insert users with the new entity structure
+INSERT INTO users (password, user_name, are_credentials_expired, is_enabled, is_expired, is_locked) 
+VALUES ('$2a$10$bJxwWc3A3DBzke7Gnb/MZ.lLXmvOIE/DFAd6QUnBvWhn7c7D1zY4C', 'Ruthger', false, true, false, false);
+
+INSERT INTO users (password, user_name, are_credentials_expired, is_enabled, is_expired, is_locked) 
+VALUES ('$2a$10$bJxwWc3A3DBzke7Gnb/MZ.lLXmvOIE/DFAd6QUnBvWhn7c7D1zY4C', 'Edwin', false, true, false, false);
+
+-- Insert user-role relationships
+INSERT INTO user_role (role_id, user_id) VALUES (1, 1);
+INSERT INTO user_role (role_id, user_id) VALUES (2, 2);
+INSERT INTO user_role (role_id, user_id) VALUES (2, 1);
 

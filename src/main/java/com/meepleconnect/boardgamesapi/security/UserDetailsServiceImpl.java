@@ -1,6 +1,6 @@
 package com.meepleconnect.boardgamesapi.security;
 
-import com.meepleconnect.boardgamesapi.models.User;
+import com.meepleconnect.boardgamesapi.entities.User;
 import com.meepleconnect.boardgamesapi.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,13 +18,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
+                .withUsername(user.getUserName())
                 .password(user.getPassword())
-                .roles(user.getRole().name())
+                .roles(user.getRoles().stream().map(r -> r.getRoleName().replace("ROLE_", "")).toArray(String[]::new))
                 .build();
     }
 }
