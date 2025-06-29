@@ -43,11 +43,11 @@ VALUES
 
 INSERT INTO users (username, password, role)
 VALUES
-    ('Ruthger', '$2a$12$IOfGkBw8cRrqz3NamrHG4O9FTXsPQ8Bo2/lNutMcitWIBzn1.Chj2', 'ADMIN'),
-    ('Jeroen', '$2a$12$Ap0HvB1RO19eSOD7DtBtheFrbkVdxa0haEhz30W2lOGbFVyaubsmO', 'USER'),
-    ('Margriet', '$2a$12$TnvQDqkxq0dWEdeCz7WubuM/qnvrxSzDBS0XmNnLita6rSrQvcAwC', 'USER'),
-    ('Jip', '$2a$12$PocIYxXiNXSEX7Ggq0kynOF4ikO5e5oGaw4j/9tJP2hJx9Qlsw9oe', 'USER'),
-    ('Janneke', '$2a$12$UTkb3xb9AUGLUeCgnww6F.HWvsFZcklVMeOv7TRMjwpG/uWxFmJ6.', 'ADMIN'),
-    ('employee1', '$2a$12$IOfGkBw8cRrqz3NamrHG4O9FTXsPQ8Bo2/lNutMcitWIBzn1.Chj2', 'EMPLOYEE'),
-    ('customer1', '$2a$12$IOfGkBw8cRrqz3NamrHG4O9FTXsPQ8Bo2/lNutMcitWIBzn1.Chj2', 'CUSTOMER');
+    ('Ruthger', '$2a$10$sKpAnHDMHNs7SLkjT/LXOO0oTZemhIW4.cQmiRXkpsQenMCE8IphS', 'ADMIN'),
+    ('Jeroen', '$2a$10$nmQgx8.6sIMAALT6iQzftePCChR9thyX2tSo9YAWJ/hm8PKa0FOVm', 'USER'),
+    ('Margriet', '$2a$10$nmQgx8.6sIMAALT6iQzftePCChR9thyX2tSo9YAWJ/hm8PKa0FOVm', 'USER'),
+    ('Jip', '$2a$10$nmQgx8.6sIMAALT6iQzftePCChR9thyX2tSo9YAWJ/hm8PKa0FOVm', 'USER'),
+    ('Janneke', '$2a$10$sKpAnHDMHNs7SLkjT/LXOO0oTZemhIW4.cQmiRXkpsQenMCE8IphS', 'ADMIN'),
+    ('employee1', '$2a$10$sKpAnHDMHNs7SLkjT/LXOO0oTZemhIW4.cQmiRXkpsQenMCE8IphS', 'EMPLOYEE'),
+    ('customer1', '$2a$10$nmQgx8.6sIMAALT6iQzftePCChR9thyX2tSo9YAWJ/hm8PKa0FOVm', 'CUSTOMER');
 

@@ -4,7 +4,6 @@ import com.meepleconnect.boardgamesapi.models.Boardgame;
 import com.meepleconnect.boardgamesapi.services.BoardgameService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,33 +21,29 @@ public class BoardgameController {
 
     @GetMapping
     public List<Boardgame> getAllBoardgames(
-        @RequestParam(required = false) String genre,
-        @RequestParam(required = false) Boolean available,
-        @RequestParam(required = false) Integer minPlayers,
-        @RequestParam(required = false) Integer maxPlayers
-    ) {
+            @RequestParam(required = false) String genre,
+            @RequestParam(required = false) Boolean available,
+            @RequestParam(required = false) Integer minPlayers,
+            @RequestParam(required = false) Integer maxPlayers) {
         return boardgameService.getFilteredBoardgames(genre, available, minPlayers, maxPlayers);
     }
-    
+
     @GetMapping("/{id}")
     public ResponseEntity<Boardgame> getBoardgameById(@PathVariable Long id) {
         return ResponseEntity.ok(boardgameService.getBoardgameById(id));
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE')")
     @PostMapping
     public ResponseEntity<Boardgame> addBoardgame(@Valid @RequestBody Boardgame boardgame) {
         Boardgame savedBoardgame = boardgameService.addBoardgame(boardgame);
         return ResponseEntity.status(201).body(savedBoardgame);
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE')")
     @PutMapping("/{id}")
     public ResponseEntity<Boardgame> updateBoardgame(@PathVariable Long id, @Valid @RequestBody Boardgame boardgame) {
         return ResponseEntity.ok(boardgameService.updateBoardgame(id, boardgame));
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBoardgame(@PathVariable Long id) {
         boardgameService.deleteBoardgame(id);

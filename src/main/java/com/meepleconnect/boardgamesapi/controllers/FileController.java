@@ -5,7 +5,6 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,7 +31,6 @@ public class FileController {
         }
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE')")
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
@@ -43,7 +41,7 @@ public class FileController {
             String originalFilename = file.getOriginalFilename();
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             String newFilename = UUID.randomUUID().toString() + extension;
-            
+
             Path filePath = uploadDir.resolve(newFilename);
             Files.copy(file.getInputStream(), filePath);
 
@@ -61,9 +59,9 @@ public class FileController {
 
             if (resource.exists() && resource.isReadable()) {
                 return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-                    .body(resource);
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                        .body(resource);
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -71,4 +69,4 @@ public class FileController {
             return ResponseEntity.badRequest().build();
         }
     }
-} 
+}
