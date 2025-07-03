@@ -1,7 +1,7 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.meepleconnect.boardgamesapi.models.User;
+import com.meepleconnect.boardgamesapi.entities.User;
 import com.meepleconnect.boardgamesapi.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,14 +40,13 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"EMPLOYEE"})
+    @WithMockUser(roles = { "EMPLOYEE" })
     void testRegisterUser_Success() throws Exception {
         User user = new User();
-        user.setUsername("testuser");
+        user.setUserName("testuser");
         user.setPassword("password");
-        User savedUser = new User();
-        savedUser.setId(1L);
-        savedUser.setUsername("testuser");
+        User savedUser = new User(1L);
+        savedUser.setUserName("testuser");
         savedUser.setPassword("password");
 
         when(userService.registerUser(any(User.class))).thenReturn(savedUser);
@@ -57,20 +56,20 @@ public class UserControllerTest {
                 .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.username").value("testuser"));
+                .andExpect(jsonPath("$.userName").value("testuser"));
 
         verify(userService, times(1)).registerUser(any(User.class));
     }
 
     @Test
-    @WithMockUser(roles = {"EMPLOYEE"})
+    @WithMockUser(roles = { "EMPLOYEE" })
     void testRegisterUser_Failure() throws Exception {
         User user = new User();
-        user.setUsername("testuser");
+        user.setUserName("testuser");
         user.setPassword("password");
 
         when(userService.registerUser(any(User.class)))
-            .thenThrow(new RuntimeException("Registration error"));
+                .thenThrow(new RuntimeException("Registration error"));
 
         mockMvc.perform(post("/api/users/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -82,11 +81,10 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"EMPLOYEE"})
+    @WithMockUser(roles = { "EMPLOYEE" })
     void testGetUserById_Success() throws Exception {
-        User user = new User();
-        user.setId(1L);
-        user.setUsername("testuser");
+        User user = new User(1L);
+        user.setUserName("testuser");
         user.setPassword("password");
 
         when(userService.getUserById(1L)).thenReturn(Optional.of(user));
@@ -94,13 +92,13 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.username").value("testuser"));
+                .andExpect(jsonPath("$.userName").value("testuser"));
 
         verify(userService, times(1)).getUserById(1L);
     }
 
     @Test
-    @WithMockUser(roles = {"EMPLOYEE"})
+    @WithMockUser(roles = { "EMPLOYEE" })
     void testGetUserById_NotFound() throws Exception {
         when(userService.getUserById(1L)).thenReturn(Optional.empty());
 
@@ -111,7 +109,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"EMPLOYEE"})
+    @WithMockUser(roles = { "EMPLOYEE" })
     void testDeleteUser_Success() throws Exception {
         doNothing().when(userService).deleteUser(1L);
 

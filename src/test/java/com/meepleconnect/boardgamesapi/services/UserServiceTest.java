@@ -1,6 +1,6 @@
 package com.meepleconnect.boardgamesapi.services;
 
-import com.meepleconnect.boardgamesapi.models.User;
+import com.meepleconnect.boardgamesapi.entities.User;
 import com.meepleconnect.boardgamesapi.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,8 +46,7 @@ public class UserServiceTest {
     @Test
     void testGetUserById() {
         Long userId = 1L;
-        User user = new User();
-        user.setId(userId);
+        User user = new User(userId);
 
         when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
 

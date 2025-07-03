@@ -9,19 +9,31 @@ import java.util.Date;
 import java.util.function.Function;
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {
 
-    // Een geldige BASE64 string (minimaal 256 bits voor HS256)
-    private static final String SECRET_KEY = "cm93YW5pc2VlbmhlbGRoaWpoZWVmdHN1cGVyZ2Vob2xwZW5kYW5ranVlbA==";
+    @Value("${jwt.secret-key}")
+    private String secretKey;
+
+    @Value("${jwt.audience}")
+    private String audience;
+
+    @Value("${jwt.issuer}")
+    private String issuer;
+
+    @Value("${jwt.expiration:3600000}")
+    private long expiration;
 
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
+                .setIssuer(issuer)
+                .setAudience(audience)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -49,7 +61,7 @@ public class JwtUtil {
     }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

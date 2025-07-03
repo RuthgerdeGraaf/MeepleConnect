@@ -1,6 +1,6 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
-import com.meepleconnect.boardgamesapi.models.User;
+import com.meepleconnect.boardgamesapi.entities.User;
 import com.meepleconnect.boardgamesapi.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

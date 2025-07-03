@@ -1,6 +1,7 @@
 package com.meepleconnect.boardgamesapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.meepleconnect.boardgamesapi.entities.User;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -27,9 +28,11 @@ public class Reservation {
 
     private String notes;
 
-    public Reservation() {}
+    public Reservation() {
+    }
 
-    public Reservation(User customer, Boardgame boardgame, LocalDate reservationDate, int participantCount, String notes) {
+    public Reservation(User customer, Boardgame boardgame, LocalDate reservationDate, int participantCount,
+            String notes) {
         this.customer = customer;
         this.boardgame = boardgame;
         this.reservationDate = reservationDate;

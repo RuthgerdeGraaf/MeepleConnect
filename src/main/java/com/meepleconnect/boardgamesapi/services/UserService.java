@@ -1,6 +1,6 @@
 package com.meepleconnect.boardgamesapi.services;
 
-import com.meepleconnect.boardgamesapi.models.User;
+import com.meepleconnect.boardgamesapi.entities.User;
 import com.meepleconnect.boardgamesapi.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,4 +30,3 @@ public class UserService {
         userRepository.deleteById(id);
     }
 }
-

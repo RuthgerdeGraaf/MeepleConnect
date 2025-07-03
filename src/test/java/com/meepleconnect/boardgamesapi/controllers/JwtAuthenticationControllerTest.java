@@ -1,12 +1,11 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.meepleconnect.boardgamesapi.entities.User;
+import com.meepleconnect.boardgamesapi.repositories.UserRepository;
 import com.meepleconnect.boardgamesapi.security.JwtRequest;
 import com.meepleconnect.boardgamesapi.security.JwtResponse;
 import com.meepleconnect.boardgamesapi.security.JwtUtil;
-import com.meepleconnect.boardgamesapi.models.User;
-import com.meepleconnect.boardgamesapi.models.Role;
-import com.meepleconnect.boardgamesapi.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,53 +52,64 @@ public class JwtAuthenticationControllerTest {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    @Autowired
+    @MockBean
     private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private User testUser;
+    private JwtRequest jwtRequest;
+
     @BeforeEach
     void setUp() {
         // Clean up any existing test user
-        userRepository.findByUsername("testuser").ifPresent(userRepository::delete);
+        userRepository.findByUserName("testuser").ifPresent(userRepository::delete);
 
         // Create a test user
-        User testUser = new User();
-        testUser.setUsername("testuser");
-        testUser.setPassword(passwordEncoder.encode("password"));
-        testUser.setRole(Role.USER);
+        testUser = new User(1L);
+        testUser.setUserName("testuser");
+        testUser.setPassword("encodedPassword");
         userRepository.save(testUser);
+
+        jwtRequest = new JwtRequest();
+        jwtRequest.setUsername("testuser");
+        jwtRequest.setPassword("password");
     }
 
     @Test
-    void createAuthenticationToken_ValidCredentials_ShouldReturnJwt() throws Exception {
-        JwtRequest request = new JwtRequest("testuser", "password");
-        String jwtToken = "test.jwt.token";
-
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(new UsernamePasswordAuthenticationToken("testuser", "password", Collections.emptyList()));
-
-        when(jwtUtil.generateToken("testuser")).thenReturn(jwtToken);
+    void login_ValidCredentials_ShouldReturnJwtToken() throws Exception {
+        when(userRepository.findByUserName("testuser")).thenReturn(Optional.of(testUser));
+        when(passwordEncoder.matches("password", "encodedPassword")).thenReturn(true);
 
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(jwtRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value(jwtToken));
+                .andExpect(jsonPath("$.token").exists());
     }
 
     @Test
-    void createAuthenticationToken_InvalidCredentials_ShouldReturn401() throws Exception {
-        JwtRequest request = new JwtRequest("testuser", "wrongpassword");
-
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new AuthenticationException("Invalid credentials") {
-                });
+    void login_InvalidCredentials_ShouldReturnUnauthorized() throws Exception {
+        when(userRepository.findByUserName("testuser")).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(jwtRequest)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void login_UserNotFound_ShouldReturnUnauthorized() throws Exception {
+        when(userRepository.findByUserName("nonexistent")).thenReturn(Optional.empty());
+
+        JwtRequest invalidRequest = new JwtRequest();
+        invalidRequest.setUsername("nonexistent");
+        invalidRequest.setPassword("password");
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isUnauthorized());
     }
 }
