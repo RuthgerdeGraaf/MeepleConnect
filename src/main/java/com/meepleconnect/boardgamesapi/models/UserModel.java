@@ -1,9 +1,16 @@
 package com.meepleconnect.boardgamesapi.models;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserModel {
     private Long id = -1L;
     private String userName;
@@ -14,75 +21,9 @@ public class UserModel {
     private boolean areCredentialsExpired;
     private boolean isEnabled;
 
-    public UserModel() {
-    }
-
+    // Custom constructor voor backward compatibility
     public UserModel(Long id) {
         this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public List<RoleModel> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<RoleModel> roles) {
-        this.roles = roles;
-    }
-
-    public boolean isExpired() {
-        return isExpired;
-    }
-
-    public void setExpired(boolean expired) {
-        isExpired = expired;
-    }
-
-    public boolean isLocked() {
-        return isLocked;
-    }
-
-    public void setLocked(boolean locked) {
-        isLocked = locked;
-    }
-
-    public boolean areCredentialsExpired() {
-        return areCredentialsExpired;
-    }
-
-    public void setAreCredentialsExpired(boolean areCredentialsExpired) {
-        this.areCredentialsExpired = areCredentialsExpired;
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
     }
 
     public List<String> getRoleNames() {
