@@ -1,10 +1,8 @@
-CREATE TABLE user_profile (
-    id BIGSERIAL PRIMARY KEY,
-    first_name VARCHAR(255),
-    last_name VARCHAR(255),
-    address VARCHAR(255),
-    phone_number VARCHAR(50),
-    date_of_birth DATE,
-    user_id BIGINT UNIQUE,
-    CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id)
+CREATE TABLE IF NOT EXISTS user_profile (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    bio TEXT,
+    avatar_url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

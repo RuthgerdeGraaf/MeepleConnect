@@ -56,11 +56,6 @@ public class ReservationController {
         }
     }
 
-    @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<Void> handleMissingParameter(MissingServletRequestParameterException ex) {
-        return ResponseEntity.badRequest().build();
-    }
-
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<Void> cancelReservation(@PathVariable Long reservationId) {
         try {
