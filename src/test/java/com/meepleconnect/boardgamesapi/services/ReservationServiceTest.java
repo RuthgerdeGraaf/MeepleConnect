@@ -1,9 +1,9 @@
 package com.meepleconnect.boardgamesapi.services;
 
+import com.meepleconnect.boardgamesapi.entities.User;
 import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
 import com.meepleconnect.boardgamesapi.models.Boardgame;
 import com.meepleconnect.boardgamesapi.models.Reservation;
-import com.meepleconnect.boardgamesapi.models.User;
 import com.meepleconnect.boardgamesapi.repositories.BoardgameRepository;
 import com.meepleconnect.boardgamesapi.repositories.ReservationRepository;
 import com.meepleconnect.boardgamesapi.repositories.UserRepository;
@@ -13,12 +13,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class ReservationServiceTest {
@@ -35,111 +36,114 @@ public class ReservationServiceTest {
     @InjectMocks
     private ReservationService reservationService;
 
-    private Reservation reservation;
-    private User user;
-    private Boardgame boardgame;
+    private User testUser;
+    private Boardgame testBoardgame;
+    private Reservation testReservation;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        user = new User();
-        user.setId(1L);
-        user.setUsername("TestUser");
 
-        boardgame = new Boardgame();
-        boardgame.setId(1L);
-        boardgame.setName("Catan");
+        testUser = new User(1L);
+        testUser.setUserName("testuser");
+        testUser.setPassword("password");
 
-        reservation = new Reservation();
-        reservation.setId(1L);
-        reservation.setBoardgame(boardgame);
-        reservation.setReservationDate(LocalDate.now());
+        testBoardgame = new Boardgame("Test Game", new BigDecimal("29.99"), true, 2, 4, "Strategy", null);
+
+        testReservation = new Reservation(testUser, testBoardgame, LocalDate.now().plusDays(1), 3, "Test reservation");
     }
 
     @Test
-    void testGetAllReservations() {
-        when(reservationRepository.findAll()).thenReturn(Arrays.asList(reservation));
+    void getAllReservations_ShouldReturnList() {
+        when(reservationRepository.findAll()).thenReturn(List.of(testReservation));
 
-        var reservations = reservationService.getAllReservations();
-        assertEquals(1, reservations.size());
+        List<Reservation> result = reservationService.getAllReservations();
+
+        assertEquals(1, result.size());
+        assertEquals(testReservation, result.get(0));
         verify(reservationRepository, times(1)).findAll();
     }
 
     @Test
-    void testGetReservationByCustomer_Success() {
-        when(reservationRepository.findByCustomerId(1L)).thenReturn(Arrays.asList(reservation));
+    void getReservationsByCustomer_ShouldReturnList() {
+        when(reservationRepository.findByCustomerId(1L)).thenReturn(List.of(testReservation));
 
-        var result = reservationService.getReservationsByCustomer(1L);
+        List<Reservation> result = reservationService.getReservationsByCustomer(1L);
+
         assertEquals(1, result.size());
+        assertEquals(testReservation, result.get(0));
         verify(reservationRepository, times(1)).findByCustomerId(1L);
     }
 
     @Test
-    void testGetReservationByCustomer_Failure() {
-        when(reservationRepository.findByCustomerId(1L)).thenReturn(Collections.emptyList());
+    void getReservationsByBoardgame_ShouldReturnList() {
+        when(reservationRepository.findByBoardgameId(1L)).thenReturn(List.of(testReservation));
 
-        var result = reservationService.getReservationsByCustomer(1L);
-        assertTrue(result.isEmpty());
-        verify(reservationRepository, times(1)).findByCustomerId(1L);
-    }
+        List<Reservation> result = reservationService.getReservationsByBoardgame(1L);
 
-    @Test
-    void testGetReservationsByBoardgame_Success() {
-        when(reservationRepository.findByBoardgameId(1L)).thenReturn(Arrays.asList(reservation));
-
-        var result = reservationService.getReservationsByBoardgame(1L);
         assertEquals(1, result.size());
+        assertEquals(testReservation, result.get(0));
         verify(reservationRepository, times(1)).findByBoardgameId(1L);
     }
 
     @Test
-    void testGetReservationsByBoardgame_Failure() {
-        when(reservationRepository.findByBoardgameId(1L)).thenReturn(Collections.emptyList());
+    void createReservation_ValidData_ShouldCreateReservation() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(boardgameRepository.findById(1L)).thenReturn(Optional.of(testBoardgame));
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(testReservation);
 
-        var result = reservationService.getReservationsByBoardgame(1L);
-        assertTrue(result.isEmpty());
-        verify(reservationRepository, times(1)).findByBoardgameId(1L);
-    }
+        Reservation result = reservationService.createReservation(1L, 1L, LocalDate.now().plusDays(1), 3, "Test");
 
-    @Test
-    void testCreateReservation_Success() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(boardgameRepository.findById(1L)).thenReturn(Optional.of(boardgame));
-        when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
-        assertEquals(reservation, reservationService.createReservation(1L, 1L, LocalDate.now(), 1, "Test"));
+        assertNotNull(result);
+        assertEquals(testReservation, result);
+        verify(userRepository, times(1)).findById(1L);
+        verify(boardgameRepository, times(1)).findById(1L);
         verify(reservationRepository, times(1)).save(any(Reservation.class));
     }
 
     @Test
-    void testCreateReservation_Failure_NoCustomer() {
+    void createReservation_CustomerNotFound_ShouldThrowException() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        when(boardgameRepository.findById(1L)).thenReturn(Optional.of(boardgame));
-        when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
-        assertThrows(GameNotFoundException.class, () -> reservationService.createReservation(1L, 1L, LocalDate.now(), 1, "Test"));
-        verify(reservationRepository, times(0)).save(any(Reservation.class));
+
+        assertThrows(GameNotFoundException.class,
+                () -> reservationService.createReservation(1L, 1L, LocalDate.now().plusDays(1), 3, "Test"));
+
+        verify(userRepository, times(1)).findById(1L);
+        verify(boardgameRepository, never()).findById(any());
+        verify(reservationRepository, never()).save(any());
     }
 
     @Test
-    void testCreateReservation_Failure_NoBoardgame() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    void createReservation_BoardgameNotFound_ShouldThrowException() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
         when(boardgameRepository.findById(1L)).thenReturn(Optional.empty());
-        when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
-        assertThrows(GameNotFoundException.class, () -> reservationService.createReservation(1L, 1L, LocalDate.now(), 1, "Test"));
-        verify(reservationRepository, times(0)).save(any(Reservation.class));
+
+        assertThrows(GameNotFoundException.class,
+                () -> reservationService.createReservation(1L, 1L, LocalDate.now().plusDays(1), 3, "Test"));
+
+        verify(userRepository, times(1)).findById(1L);
+        verify(boardgameRepository, times(1)).findById(1L);
+        verify(reservationRepository, never()).save(any());
     }
 
     @Test
-    void testCancelReservation_Success() {
+    void cancelReservation_ExistingId_ShouldDeleteReservation() {
         when(reservationRepository.existsById(1L)).thenReturn(true);
-        reservationService.cancelReservation(1L);
-        assertEquals(0, reservationRepository.findAll().size());
+        doNothing().when(reservationRepository).deleteById(1L);
+
+        assertDoesNotThrow(() -> reservationService.cancelReservation(1L));
+
+        verify(reservationRepository, times(1)).existsById(1L);
         verify(reservationRepository, times(1)).deleteById(1L);
     }
 
     @Test
-    void testCancelReservation_Failure() {
+    void cancelReservation_NonExistingId_ShouldThrowException() {
         when(reservationRepository.existsById(1L)).thenReturn(false);
+
         assertThrows(GameNotFoundException.class, () -> reservationService.cancelReservation(1L));
-        verify(reservationRepository, times(0)).deleteById(1L);
+
+        verify(reservationRepository, times(1)).existsById(1L);
+        verify(reservationRepository, never()).deleteById(any());
     }
 }
