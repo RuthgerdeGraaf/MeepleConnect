@@ -13,7 +13,6 @@ public class RoleModel {
     private boolean active;
     private String description;
 
-    // Custom constructors voor backward compatibility
     public RoleModel(Long id) {
         this.id = id;
     }

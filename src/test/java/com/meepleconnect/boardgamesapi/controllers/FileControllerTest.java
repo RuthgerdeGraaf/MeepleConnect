@@ -82,7 +82,6 @@ public class FileControllerTest {
     @Test
     @WithMockUser(roles = "EMPLOYEE")
     void uploadAndDownloadFile_Success() throws Exception {
-        // Upload een bestand
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "test.txt",
@@ -96,7 +95,6 @@ public class FileControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        // Download het bestand
         mockMvc.perform(MockMvcRequestBuilders.get("/api/files/download/" + filename))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Disposition", "attachment; filename=\"" + filename + "\""))

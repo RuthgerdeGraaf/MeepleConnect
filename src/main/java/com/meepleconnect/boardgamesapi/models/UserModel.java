@@ -21,14 +21,13 @@ public class UserModel {
     private boolean areCredentialsExpired;
     private boolean isEnabled;
 
-    // Custom constructor voor backward compatibility
     public UserModel(Long id) {
         this.id = id;
     }
 
     public List<String> getRoleNames() {
         return roles.stream()
-                .map(RoleModel::getRoleName) // Converts each Role object to its name
+                .map(RoleModel::getRoleName)
                 .collect(Collectors.toList());
     }
 }

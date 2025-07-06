@@ -63,10 +63,8 @@ public class JwtAuthenticationControllerTest {
 
     @BeforeEach
     void setUp() {
-        // Clean up any existing test user
         userRepository.findByUserName("testuser").ifPresent(userRepository::delete);
 
-        // Create a test user
         testUser = new User(1L);
         testUser.setUserName("testuser");
         testUser.setPassword("encodedPassword");
