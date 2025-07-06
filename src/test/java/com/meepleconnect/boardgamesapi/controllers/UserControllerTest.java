@@ -102,12 +102,12 @@ public class UserControllerTest {
     @Test
     @WithMockUser(roles = { "EMPLOYEE" })
     void testGetUserById_NotFound() throws Exception {
-        when(userService.getUserById(1L)).thenThrow(new UserNotFoundException("User met ID 1 niet gevonden."));
+        when(userService.getUserById(1L)).thenThrow(new UserNotFoundException("User with ID 1 not found."));
 
         mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("User Not Found"))
-                .andExpect(jsonPath("$.message").value("User met ID 1 niet gevonden."));
+                .andExpect(jsonPath("$.message").value("User with ID 1 not found."));
 
         verify(userService, times(1)).getUserById(1L);
     }

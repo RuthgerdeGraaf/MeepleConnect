@@ -22,54 +22,52 @@ import java.util.UUID;
 @RequestMapping("/api/files")
 public class FileController {
 
-    private final Path uploadDir = Paths.get("uploads");
+    private final Path uploadPath = Paths.get("uploads");
 
     public FileController() {
         try {
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Kon upload directory niet aanmaken", e);
+            throw new RuntimeException("Could not create upload directory", e);
         }
     }
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
-            throw new BadRequestException("File is leeg");
+            throw new BadRequestException("File is empty");
         }
 
         try {
-            String originalFilename = file.getOriginalFilename();
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String newFilename = UUID.randomUUID().toString() + extension;
-
-            Path filePath = uploadDir.resolve(newFilename);
+            String filename = UUID.randomUUID().toString() + ".txt";
+            Path filePath = uploadPath.resolve(filename);
             Files.copy(file.getInputStream(), filePath);
 
-            return ResponseEntity.ok(newFilename);
+            return ResponseEntity.ok(filename);
         } catch (IOException e) {
-            throw new FileUploadException("Kon file niet uploaden: " + e.getMessage(), e);
+            throw new FileUploadException("Could not upload file: " + e.getMessage(), e);
         }
     }
 
-    @GetMapping("/download/{filename}")
+    @GetMapping("/{filename:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
         try {
-            Path filePath = uploadDir.resolve(filename);
+            Path filePath = uploadPath.resolve(filename).normalize();
             Resource resource = new UrlResource(filePath.toUri());
 
             if (resource.exists() && resource.isReadable()) {
                 return ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                        .header(HttpHeaders.CONTENT_DISPOSITION,
+                                "attachment; filename=\"" + resource.getFilename() + "\"")
                         .body(resource);
             } else {
-                throw new FileNotFoundException("File '" + filename + "' niet gevonden");
+                throw new FileNotFoundException("File '" + filename + "' not found");
             }
         } catch (MalformedURLException e) {
-            throw new BadRequestException("Ongeldige file URL");
+            throw new BadRequestException("Invalid file URL");
         }
     }
 }
