@@ -1,11 +1,11 @@
 package com.meepleconnect.boardgamesapi.services;
 
+import com.meepleconnect.boardgamesapi.exceptions.PublisherNotFoundException;
 import com.meepleconnect.boardgamesapi.models.Publisher;
 import com.meepleconnect.boardgamesapi.repositories.PublisherRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PublisherService {
@@ -20,8 +20,9 @@ public class PublisherService {
         return publisherRepository.findAll();
     }
 
-    public Optional<Publisher> getPublisherById(Long id) {
-        return publisherRepository.findById(id);
+    public Publisher getPublisherById(Long id) {
+        return publisherRepository.findById(id)
+                .orElseThrow(() -> new PublisherNotFoundException("Publisher met ID " + id + " niet gevonden."));
     }
 
     public List<Publisher> getPublishersByCountry(String country) {
@@ -32,7 +33,7 @@ public class PublisherService {
         return publisherRepository.save(publisher);
     }
 
-    public Optional<Publisher> updatePublisher(Long id, Publisher updatedPublisher) {
+    public Publisher updatePublisher(Long id, Publisher updatedPublisher) {
         return publisherRepository.findById(id).map(existingPublisher -> {
             existingPublisher.setName(updatedPublisher.getName());
             existingPublisher.setCountryOfOrigin(updatedPublisher.getCountryOfOrigin());
@@ -40,14 +41,13 @@ public class PublisherService {
             existingPublisher.setIndie(updatedPublisher.isIndie());
 
             return publisherRepository.save(existingPublisher);
-        });
+        }).orElseThrow(() -> new PublisherNotFoundException("Publisher met ID " + id + " niet gevonden."));
     }
 
-    public boolean deletePublisher(Long id) {
-        if (publisherRepository.existsById(id)) {
-            publisherRepository.deleteById(id);
-            return true;
+    public void deletePublisher(Long id) {
+        if (!publisherRepository.existsById(id)) {
+            throw new PublisherNotFoundException("Publisher met ID " + id + " niet gevonden.");
         }
-        return false;
+        publisherRepository.deleteById(id);
     }
 }

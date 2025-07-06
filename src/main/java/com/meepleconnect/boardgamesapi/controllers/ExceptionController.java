@@ -5,6 +5,10 @@ import com.meepleconnect.boardgamesapi.exceptions.ConflictException;
 import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
 import com.meepleconnect.boardgamesapi.exceptions.ReservationNotFoundException;
 import com.meepleconnect.boardgamesapi.exceptions.TeapotException;
+import com.meepleconnect.boardgamesapi.exceptions.UserNotFoundException;
+import com.meepleconnect.boardgamesapi.exceptions.PublisherNotFoundException;
+import com.meepleconnect.boardgamesapi.exceptions.FileNotFoundException;
+import com.meepleconnect.boardgamesapi.exceptions.FileUploadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -160,6 +164,44 @@ public class ExceptionController {
 
         body.put("fieldErrors", fieldErrors);
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handelt UserNotFoundException af - wordt gebruikt wanneer een user niet
+     * gevonden wordt
+     */
+    @ExceptionHandler(value = UserNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
+        logger.info("User Not Found Exception: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "User Not Found", ex.getMessage());
+    }
+
+    /**
+     * Handelt PublisherNotFoundException af - wordt gebruikt wanneer een publisher
+     * niet gevonden wordt
+     */
+    @ExceptionHandler(value = PublisherNotFoundException.class)
+    public ResponseEntity<Object> handlePublisherNotFoundException(PublisherNotFoundException ex) {
+        logger.info("Publisher Not Found Exception: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "Publisher Not Found", ex.getMessage());
+    }
+
+    /**
+     * Handelt FileNotFoundException af - wordt gebruikt wanneer een file niet gevonden wordt
+     */
+    @ExceptionHandler(value = FileNotFoundException.class)
+    public ResponseEntity<Object> handleFileNotFoundException(FileNotFoundException ex) {
+        logger.info("File Not Found Exception: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "File Not Found", ex.getMessage());
+    }
+
+    /**
+     * Handelt FileUploadException af - wordt gebruikt voor file upload problemen
+     */
+    @ExceptionHandler(value = FileUploadException.class)
+    public ResponseEntity<Object> handleFileUploadException(FileUploadException ex) {
+        logger.warn("File Upload Exception: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "File Upload Error", ex.getMessage());
     }
 
     /**

@@ -3,6 +3,7 @@ package com.meepleconnect.boardgamesapi.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meepleconnect.boardgamesapi.entities.User;
 import com.meepleconnect.boardgamesapi.services.UserService;
+import com.meepleconnect.boardgamesapi.exceptions.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -74,8 +75,9 @@ public class UserControllerTest {
         mockMvc.perform(post("/api/users/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Error by registration: Registration error"));
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.error").value("Internal Server Error"))
+                .andExpect(jsonPath("$.message").value("Registration error"));
 
         verify(userService, times(1)).registerUser(any(User.class));
     }
@@ -87,7 +89,7 @@ public class UserControllerTest {
         user.setUserName("testuser");
         user.setPassword("password");
 
-        when(userService.getUserById(1L)).thenReturn(Optional.of(user));
+        when(userService.getUserById(1L)).thenReturn(user);
 
         mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isOk())
@@ -100,10 +102,12 @@ public class UserControllerTest {
     @Test
     @WithMockUser(roles = { "EMPLOYEE" })
     void testGetUserById_NotFound() throws Exception {
-        when(userService.getUserById(1L)).thenReturn(Optional.empty());
+        when(userService.getUserById(1L)).thenThrow(new UserNotFoundException("User met ID 1 niet gevonden."));
 
         mockMvc.perform(get("/api/users/1"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("User Not Found"))
+                .andExpect(jsonPath("$.message").value("User met ID 1 niet gevonden."));
 
         verify(userService, times(1)).getUserById(1L);
     }
