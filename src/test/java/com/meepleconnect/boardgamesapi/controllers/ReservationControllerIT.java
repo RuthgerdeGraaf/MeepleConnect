@@ -46,17 +46,14 @@ public class ReservationControllerIT {
 
     @BeforeEach
     void setUp() {
-        // Create test user
         testUser = new User();
         testUser.setUserName("testuser");
         testUser.setPassword("password");
         testUser = userRepository.save(testUser);
 
-        // Create test boardgame
         testBoardgame = new Boardgame("Test Game", new BigDecimal("29.99"), true, 2, 4, "Strategy", null);
         testBoardgame = boardgameRepository.save(testBoardgame);
 
-        // Create test reservation
         testReservation = new Reservation(testUser, testBoardgame, LocalDate.now().plusDays(1), 3, "Test reservation");
         testReservation = reservationRepository.save(testReservation);
     }
@@ -113,7 +110,6 @@ public class ReservationControllerIT {
                 .andExpect(status().isNotFound());
     }
 
-    // Helper class for reservation requests
     private static class ReservationRequest {
         private Long customerId;
         private Long boardgameId;
@@ -129,7 +125,6 @@ public class ReservationControllerIT {
             this.notes = notes;
         }
 
-        // Getters and setters
         public Long getCustomerId() { return customerId; }
         public void setCustomerId(Long customerId) { this.customerId = customerId; }
         public Long getBoardgameId() { return boardgameId; }

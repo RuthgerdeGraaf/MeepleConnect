@@ -27,7 +27,6 @@ public class Role {
     @ManyToMany(mappedBy = "roles")
     private List<User> users = new ArrayList<>();
 
-    // Custom constructor voor backward compatibility
     public Role(Long id) {
         this.id = id;
     }

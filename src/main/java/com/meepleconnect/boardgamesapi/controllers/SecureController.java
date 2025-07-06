@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SecureController {
 
-    // private Authentication authentication;
 
     @GetMapping("/secure")
     public ResponseEntity<String> getSecureData() {

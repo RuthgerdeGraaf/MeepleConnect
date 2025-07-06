@@ -39,7 +39,6 @@ public class User {
     @Column(nullable = false)
     private boolean isEnabled = true;
 
-    // Custom constructor voor backward compatibility
     public User(Long id) {
         this.id = id;
     }
