@@ -1,6 +1,7 @@
 package com.meepleconnect.boardgamesapi.services;
 
 import com.meepleconnect.boardgamesapi.entities.User;
+import com.meepleconnect.boardgamesapi.exceptions.UserNotFoundException;
 import com.meepleconnect.boardgamesapi.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,7 @@ public class UserService {
 
     public User getUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new com.meepleconnect.boardgamesapi.exceptions.UserNotFoundException(
-                        "User met ID " + id + " niet gevonden."));
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found."));
     }
 
     public void deleteUser(Long id) {

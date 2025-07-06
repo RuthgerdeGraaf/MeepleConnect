@@ -83,7 +83,7 @@ public class DataInitializer implements CommandLineRunner {
         edwin.setRoles(Arrays.asList(userRole));
         userRepository.save(edwin);
 
-        System.out.println("✅ Standaard gebruikers aangemaakt: Ruthger & Edwin (wachtwoord: password123)");
+        System.out.println("✅ Standard users created: Ruthger & Edwin (password: password123)");
     }
 
     private void initializePublishers() {
@@ -137,13 +137,13 @@ public class DataInitializer implements CommandLineRunner {
         publisherRepository.save(fantasyFlight);
 
         System.out.println(
-                "✅ Publishers aangemaakt: Mayfair Games, Days of Wonder, Z-Man Games, Hasbro, Chess House, Czech Games Edition, Fantasy Flight Games");
+                "✅ Publishers created: Mayfair Games, Days of Wonder, Z-Man Games, Hasbro, Chess House, Czech Games Edition, Fantasy Flight Games");
     }
 
     private void initializeBoardgames() {
         List<Publisher> publishers = publisherRepository.findAll();
         if (publishers.isEmpty()) {
-            System.out.println("⚠️ Geen publishers gevonden. Maak eerst publishers aan.");
+            System.out.println("⚠️ No publishers found. Create publishers first.");
             return;
         }
 
@@ -243,6 +243,6 @@ public class DataInitializer implements CommandLineRunner {
         boardgameRepository.save(settlers);
 
         System.out.println(
-                "✅ Standaard boardgames aangemaakt: Catan, Ticket to Ride, Pandemic, Monopoly, Chess, Codenames, Star Wars: Rebellion, The Settlers of Catan");
+                "✅ Standard boardgames created: Catan, Ticket to Ride, Pandemic, Monopoly, Chess, Codenames, Star Wars: Rebellion, The Settlers of Catan");
     }
 }

@@ -1,237 +1,141 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
-import com.meepleconnect.boardgamesapi.exceptions.BadRequestException;
-import com.meepleconnect.boardgamesapi.exceptions.ConflictException;
-import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
-import com.meepleconnect.boardgamesapi.exceptions.ReservationNotFoundException;
-import com.meepleconnect.boardgamesapi.exceptions.TeapotException;
-import com.meepleconnect.boardgamesapi.exceptions.UserNotFoundException;
-import com.meepleconnect.boardgamesapi.exceptions.PublisherNotFoundException;
-import com.meepleconnect.boardgamesapi.exceptions.FileNotFoundException;
-import com.meepleconnect.boardgamesapi.exceptions.FileUploadException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
-import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.*;
+import com.meepleconnect.boardgamesapi.exceptions.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Global Exception Handler voor de MeepleConnect Boardgames API.
+ * Global exception handler for the entire application.
  * 
- * Deze klasse handelt alle exceptions af die kunnen optreden in de applicatie
- * en zorgt voor consistente error responses. Het gebruikt @ControllerAdvice
- * om automatisch alle exceptions op te vangen die niet lokaal worden
- * afgehandeld.
+ * This controller advice automatically catches all exceptions that are not
+ * handled locally
+ * and returns appropriate HTTP status codes and error messages.
  * 
- * Belangrijke kenmerken:
- * - Consistente error response structuur
- * - Logging van alle exceptions voor debugging
- * - Specifieke HTTP status codes voor verschillende exception types
- * - Gebruiksvriendelijke error messages
+ * It provides a consistent error response format across all endpoints.
  */
 @ControllerAdvice
 public class ExceptionController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExceptionController.class);
-
     /**
-     * Handelt BadRequestException af - wordt gebruikt voor ongeldige input data
+     * Error response structure
      */
-    @ExceptionHandler(value = BadRequestException.class)
-    public ResponseEntity<Object> handleBadRequestException(BadRequestException ex) {
-        logger.warn("Bad Request Exception: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage());
+    private static class ErrorResponse {
+        private final String error;
+        private final String message;
+        private final LocalDateTime timestamp;
+
+        public ErrorResponse(String error, String message) {
+            this.error = error;
+            this.message = message;
+            this.timestamp = LocalDateTime.now();
+        }
+
+        public String getError() {
+            return error;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public LocalDateTime getTimestamp() {
+            return timestamp;
+        }
     }
 
     /**
-     * Handelt IllegalArgumentException af - wordt gebruikt voor ongeldige method
-     * parameters
+     * Handles GameNotFoundException - used when a boardgame is not found
      */
-    @ExceptionHandler(value = IllegalArgumentException.class)
-    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
-        logger.warn("Illegal Argument Exception: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Illegal Argument", ex.getMessage());
+    @ExceptionHandler(GameNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleGameNotFoundException(GameNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse("Game Not Found", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     /**
-     * Handelt GameNotFoundException af - wordt gebruikt wanneer een bordspel niet
-     * gevonden wordt
+     * Handles ReservationNotFoundException - used when a reservation is not found
      */
-    @ExceptionHandler(value = GameNotFoundException.class)
-    public ResponseEntity<Object> handleGameNotFoundException(GameNotFoundException ex) {
-        logger.info("Game Not Found Exception: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.NOT_FOUND, "Game Not Found", ex.getMessage());
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReservationNotFoundException(ReservationNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse("Reservation Not Found", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     /**
-     * Handelt ReservationNotFoundException af - wordt gebruikt wanneer een
-     * reservering niet gevonden wordt
+     * Handles PublisherNotFoundException - used when a publisher is not found
      */
-    @ExceptionHandler(value = ReservationNotFoundException.class)
-    public ResponseEntity<Object> handleReservationNotFoundException(ReservationNotFoundException ex) {
-        logger.info("Reservation Not Found Exception: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.NOT_FOUND, "Reservation Not Found", ex.getMessage());
+    @ExceptionHandler(PublisherNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePublisherNotFoundException(PublisherNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse("Publisher Not Found", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     /**
-     * Handelt IndexOutOfBoundsException af - wordt gebruikt voor array/list index
-     * problemen
+     * Handles UserNotFoundException - used when a user is not found
      */
-    @ExceptionHandler(value = IndexOutOfBoundsException.class)
-    public ResponseEntity<Object> handleIndexOutOfBoundsException(IndexOutOfBoundsException ex) {
-        logger.warn("Index Out Of Bounds Exception: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.NOT_FOUND, "Index out of bounds", ex.getMessage());
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse("User Not Found", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     /**
-     * Handelt ConflictException af - wordt gebruikt voor conflicterende data (bijv.
-     * dubbele entries)
+     * Handles FileNotFoundException - used when a file is not found
      */
-    @ExceptionHandler(value = ConflictException.class)
-    public ResponseEntity<Object> handleConflictException(ConflictException ex) {
-        logger.warn("Conflict Exception: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.CONFLICT, "Conflict", ex.getMessage());
+    @ExceptionHandler(FileNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleFileNotFoundException(FileNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse("File Not Found", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     /**
-     * Handelt TeapotException af - easter egg exception voor HTTP 418 status
+     * Handles BadRequestException - used for invalid input data
      */
-    @ExceptionHandler(value = TeapotException.class)
-    public ResponseEntity<Object> handleTeapotException(TeapotException ex) {
-        logger.info("Teapot Exception (Easter Egg): {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.I_AM_A_TEAPOT, "I'm a teapot", ex.getMessage());
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
+        ErrorResponse error = new ErrorResponse("Bad Request", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     /**
-     * Handelt AuthorizationDeniedException af - wordt gebruikt voor
-     * toegangscontrole problemen
+     * Handles ConflictException - used for duplicate data conflicts
      */
-    @ExceptionHandler(value = AuthorizationDeniedException.class)
-    public ResponseEntity<Object> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
-        logger.warn("Authorization Denied Exception: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.FORBIDDEN, "Access Denied",
-                "You don't have permission to access this resource");
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflictException(ConflictException ex) {
+        ErrorResponse error = new ErrorResponse("Conflict", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
     /**
-     * Handelt AuthenticationException af - wordt gebruikt voor authenticatie
-     * problemen
+     * Handles TeapotException - special easter egg exception
      */
-    @ExceptionHandler(value = AuthenticationException.class)
-    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
-        logger.warn("Authentication Exception: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Authentication Failed",
-                "Invalid username or password");
+    @ExceptionHandler(TeapotException.class)
+    public ResponseEntity<ErrorResponse> handleTeapotException(TeapotException ex) {
+        ErrorResponse error = new ErrorResponse("I'm a Teapot", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(error);
     }
 
     /**
-     * Handelt MissingServletRequestParameterException af - wordt gebruikt voor
-     * ontbrekende request parameters
+     * Handles FileUploadException - used for file upload errors
      */
-    @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<Object> handleMissingServletRequestParameterException(
-            MissingServletRequestParameterException ex) {
-        logger.warn("Missing Servlet Request Parameter Exception: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Missing Parameter",
-                "Required parameter '" + ex.getParameterName() + "' is missing");
+    @ExceptionHandler(FileUploadException.class)
+    public ResponseEntity<ErrorResponse> handleFileUploadException(FileUploadException ex) {
+        ErrorResponse error = new ErrorResponse("File Upload Error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
     /**
-     * Handelt MethodArgumentNotValidException af - wordt gebruikt voor validatie
-     * fouten
-     * Geeft gedetailleerde field errors terug voor betere debugging
-     */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException ex) {
-        logger.warn("Validation Exception: {}", ex.getMessage());
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Validation Error");
-        body.put("message", "One or more validation errors occurred");
-
-        Map<String, String> fieldErrors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors()
-                .forEach(error -> fieldErrors.put(error.getField(), error.getDefaultMessage()));
-
-        body.put("fieldErrors", fieldErrors);
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * Handelt UserNotFoundException af - wordt gebruikt wanneer een user niet
-     * gevonden wordt
-     */
-    @ExceptionHandler(value = UserNotFoundException.class)
-    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
-        logger.info("User Not Found Exception: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.NOT_FOUND, "User Not Found", ex.getMessage());
-    }
-
-    /**
-     * Handelt PublisherNotFoundException af - wordt gebruikt wanneer een publisher
-     * niet gevonden wordt
-     */
-    @ExceptionHandler(value = PublisherNotFoundException.class)
-    public ResponseEntity<Object> handlePublisherNotFoundException(PublisherNotFoundException ex) {
-        logger.info("Publisher Not Found Exception: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.NOT_FOUND, "Publisher Not Found", ex.getMessage());
-    }
-
-    /**
-     * Handelt FileNotFoundException af - wordt gebruikt wanneer een file niet gevonden wordt
-     */
-    @ExceptionHandler(value = FileNotFoundException.class)
-    public ResponseEntity<Object> handleFileNotFoundException(FileNotFoundException ex) {
-        logger.info("File Not Found Exception: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.NOT_FOUND, "File Not Found", ex.getMessage());
-    }
-
-    /**
-     * Handelt FileUploadException af - wordt gebruikt voor file upload problemen
-     */
-    @ExceptionHandler(value = FileUploadException.class)
-    public ResponseEntity<Object> handleFileUploadException(FileUploadException ex) {
-        logger.warn("File Upload Exception: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "File Upload Error", ex.getMessage());
-    }
-
-    /**
-     * Catch-all exception handler voor alle andere exceptions
-     * Logt de volledige stack trace voor debugging maar toont geen gevoelige
-     * informatie aan de client
+     * Generic exception handler for any unhandled exceptions
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleGlobalException(Exception ex) {
-        logger.error("Unhandled Exception occurred: {}", ex.getMessage(), ex);
-        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",
-                "An unexpected error occurred. Please try again later.");
-    }
-
-    /**
-     * Bouwt een consistente error response op met timestamp, status, error type en
-     * message
-     * 
-     * @param status  HTTP status code
-     * @param error   Korte beschrijving van het error type
-     * @param message Gedetailleerde error message
-     * @return ResponseEntity met gestructureerde error response
-     */
-    private ResponseEntity<Object> buildErrorResponse(HttpStatus status, String error, String message) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("error", error);
-        body.put("message", message);
-
-        return new ResponseEntity<>(body, status);
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+        ErrorResponse error = new ErrorResponse("Internal Server Error", "An unexpected error occurred");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }

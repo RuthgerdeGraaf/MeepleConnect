@@ -1,5 +1,8 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
+import com.meepleconnect.boardgamesapi.dtos.BoardgameDTOMapper;
+import com.meepleconnect.boardgamesapi.dtos.BoardgameRequestDTO;
+import com.meepleconnect.boardgamesapi.dtos.BoardgameResponseDTO;
 import com.meepleconnect.boardgamesapi.models.Boardgame;
 import com.meepleconnect.boardgamesapi.services.BoardgameService;
 import jakarta.validation.Valid;
@@ -14,34 +17,43 @@ import java.util.List;
 public class BoardgameController {
 
     private final BoardgameService boardgameService;
+    private final BoardgameDTOMapper boardgameDTOMapper;
 
-    public BoardgameController(BoardgameService boardgameService) {
+    public BoardgameController(BoardgameService boardgameService, BoardgameDTOMapper boardgameDTOMapper) {
         this.boardgameService = boardgameService;
+        this.boardgameDTOMapper = boardgameDTOMapper;
     }
 
     @GetMapping
-    public List<Boardgame> getAllBoardgames(
+    public List<BoardgameResponseDTO> getAllBoardgames(
             @RequestParam(required = false) String genre,
             @RequestParam(required = false) Boolean available,
             @RequestParam(required = false) Integer minPlayers,
             @RequestParam(required = false) Integer maxPlayers) {
-        return boardgameService.getFilteredBoardgames(genre, available, minPlayers, maxPlayers);
+        List<Boardgame> boardgames = boardgameService.getFilteredBoardgames(genre, available, minPlayers, maxPlayers);
+        return boardgameDTOMapper.toResponseDTOList(boardgames);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Boardgame> getBoardgameById(@PathVariable Long id) {
-        return ResponseEntity.ok(boardgameService.getBoardgameById(id));
+    public ResponseEntity<BoardgameResponseDTO> getBoardgameById(@PathVariable Long id) {
+        Boardgame boardgame = boardgameService.getBoardgameById(id);
+        return ResponseEntity.ok(boardgameDTOMapper.toResponseDTO(boardgame));
     }
 
     @PostMapping
-    public ResponseEntity<Boardgame> addBoardgame(@Valid @RequestBody Boardgame boardgame) {
+    public ResponseEntity<BoardgameResponseDTO> addBoardgame(
+            @Valid @RequestBody BoardgameRequestDTO boardgameRequestDTO) {
+        Boardgame boardgame = boardgameDTOMapper.toEntity(boardgameRequestDTO);
         Boardgame savedBoardgame = boardgameService.addBoardgame(boardgame);
-        return ResponseEntity.status(201).body(savedBoardgame);
+        return ResponseEntity.status(201).body(boardgameDTOMapper.toResponseDTO(savedBoardgame));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Boardgame> updateBoardgame(@PathVariable Long id, @Valid @RequestBody Boardgame boardgame) {
-        return ResponseEntity.ok(boardgameService.updateBoardgame(id, boardgame));
+    public ResponseEntity<BoardgameResponseDTO> updateBoardgame(@PathVariable Long id,
+            @Valid @RequestBody BoardgameRequestDTO boardgameRequestDTO) {
+        Boardgame boardgame = boardgameDTOMapper.toEntity(boardgameRequestDTO);
+        Boardgame updatedBoardgame = boardgameService.updateBoardgame(id, boardgame);
+        return ResponseEntity.ok(boardgameDTOMapper.toResponseDTO(updatedBoardgame));
     }
 
     @DeleteMapping("/{id}")

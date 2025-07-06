@@ -22,7 +22,7 @@ public class PublisherService {
 
     public Publisher getPublisherById(Long id) {
         return publisherRepository.findById(id)
-                .orElseThrow(() -> new PublisherNotFoundException("Publisher met ID " + id + " niet gevonden."));
+                .orElseThrow(() -> new PublisherNotFoundException("Publisher with ID " + id + " not found."));
     }
 
     public List<Publisher> getPublishersByCountry(String country) {
@@ -41,12 +41,12 @@ public class PublisherService {
             existingPublisher.setIndie(updatedPublisher.isIndie());
 
             return publisherRepository.save(existingPublisher);
-        }).orElseThrow(() -> new PublisherNotFoundException("Publisher met ID " + id + " niet gevonden."));
+        }).orElseThrow(() -> new PublisherNotFoundException("Publisher with ID " + id + " not found."));
     }
 
     public void deletePublisher(Long id) {
         if (!publisherRepository.existsById(id)) {
-            throw new PublisherNotFoundException("Publisher met ID " + id + " niet gevonden.");
+            throw new PublisherNotFoundException("Publisher with ID " + id + " not found.");
         }
         publisherRepository.deleteById(id);
     }

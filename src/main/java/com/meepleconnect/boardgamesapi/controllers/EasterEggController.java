@@ -22,6 +22,6 @@ public class EasterEggController {
         if (id == 418) {
             throw new TeapotException("This boardgame is a teapot!");
         }
-        throw new GameNotFoundException("Boardgame met ID " + id + " niet gevonden.");
+        throw new GameNotFoundException("Boardgame with ID " + id + " not found.");
     }
 }
