@@ -1,13 +1,13 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
-import com.meepleconnect.boardgamesapi.exceptions.GameNotFoundException;
+import com.meepleconnect.boardgamesapi.exceptions.BadRequestException;
 import com.meepleconnect.boardgamesapi.models.Reservation;
 import com.meepleconnect.boardgamesapi.services.ReservationService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -44,25 +44,21 @@ public class ReservationController {
             @RequestParam(required = false) String notes) {
 
         if (participantCount <= 0) {
-            return ResponseEntity.badRequest().build();
+            throw new BadRequestException("Aantal deelnemers moet groter zijn dan 0.");
         }
 
         try {
             LocalDate date = LocalDate.parse(reservationDate);
-            return ResponseEntity
-                    .ok(reservationService.createReservation(customerId, boardgameId, date, participantCount, notes));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            Reservation reservation = reservationService.createReservation(customerId, boardgameId, date, participantCount, notes);
+            return ResponseEntity.ok(reservation);
+        } catch (DateTimeParseException e) {
+            throw new BadRequestException("Ongeldige datum format. Gebruik YYYY-MM-DD.");
         }
     }
 
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<Void> cancelReservation(@PathVariable Long reservationId) {
-        try {
-            reservationService.cancelReservation(reservationId);
-            return ResponseEntity.noContent().build();
-        } catch (GameNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        reservationService.cancelReservation(reservationId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,5 +1,8 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
+import com.meepleconnect.boardgamesapi.exceptions.BadRequestException;
+import com.meepleconnect.boardgamesapi.exceptions.FileNotFoundException;
+import com.meepleconnect.boardgamesapi.exceptions.FileUploadException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -33,11 +36,11 @@ public class FileController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-        try {
-            if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body("File is empty");
-            }
+        if (file.isEmpty()) {
+            throw new BadRequestException("File is leeg");
+        }
 
+        try {
             String originalFilename = file.getOriginalFilename();
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             String newFilename = UUID.randomUUID().toString() + extension;
@@ -47,7 +50,7 @@ public class FileController {
 
             return ResponseEntity.ok(newFilename);
         } catch (IOException e) {
-            return ResponseEntity.internalServerError().body("Could not upload file: " + e.getMessage());
+            throw new FileUploadException("Kon file niet uploaden: " + e.getMessage(), e);
         }
     }
 
@@ -63,10 +66,10 @@ public class FileController {
                         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
                         .body(resource);
             } else {
-                return ResponseEntity.notFound().build();
+                throw new FileNotFoundException("File '" + filename + "' niet gevonden");
             }
         } catch (MalformedURLException e) {
-            return ResponseEntity.badRequest().build();
+            throw new BadRequestException("Ongeldige file URL");
         }
     }
 }

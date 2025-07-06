@@ -22,8 +22,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new com.meepleconnect.boardgamesapi.exceptions.UserNotFoundException(
+                        "User met ID " + id + " niet gevonden."));
     }
 
     public void deleteUser(Long id) {

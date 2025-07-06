@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/publishers")
@@ -25,8 +24,8 @@ public class PublisherController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Publisher> getPublisherById(@PathVariable Long id) {
-        Optional<Publisher> publisher = publisherService.getPublisherById(id);
-        return publisher.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        Publisher publisher = publisherService.getPublisherById(id);
+        return ResponseEntity.ok(publisher);
     }
 
     @GetMapping("/country/{country}")
@@ -42,15 +41,13 @@ public class PublisherController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Publisher> updatePublisher(@PathVariable Long id, @RequestBody Publisher updatedPublisher) {
-        Optional<Publisher> updated = publisherService.updatePublisher(id, updatedPublisher);
-        return updated.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        Publisher publisher = publisherService.updatePublisher(id, updatedPublisher);
+        return ResponseEntity.ok(publisher);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePublisher(@PathVariable Long id) {
-        if (publisherService.deletePublisher(id)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        publisherService.deletePublisher(id);
+        return ResponseEntity.noContent().build();
     }
 }

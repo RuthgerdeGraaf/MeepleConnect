@@ -1,12 +1,11 @@
 package com.meepleconnect.boardgamesapi.services;
 
 import com.meepleconnect.boardgamesapi.entities.User;
+import com.meepleconnect.boardgamesapi.exceptions.UserNotFoundException;
 import com.meepleconnect.boardgamesapi.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -44,17 +43,28 @@ public class UserServiceTest {
     }
 
     @Test
-    void testGetUserById() {
+    void testGetUserById_Success() {
         Long userId = 1L;
         User user = new User(userId);
 
         when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
 
-        Object result = userService.getUserById(userId);
+        User result = userService.getUserById(userId);
 
         assertNotNull(result);
-        assertInstanceOf(Optional.class, result);
-        assertEquals(user, ((java.util.Optional<?>) result).get());
+        assertEquals(user, result);
+        verify(userRepository, times(1)).findById(userId);
+    }
+
+    @Test
+    void testGetUserById_NotFound() {
+        Long userId = 1L;
+
+        when(userRepository.findById(userId)).thenReturn(java.util.Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> {
+            userService.getUserById(userId);
+        });
         verify(userRepository, times(1)).findById(userId);
     }
 
