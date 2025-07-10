@@ -5,6 +5,7 @@ import com.meepleconnect.boardgamesapi.services.PublisherService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -36,7 +37,8 @@ public class PublisherController {
     @PostMapping
     public ResponseEntity<Publisher> addPublisher(@RequestBody Publisher publisher) {
         Publisher savedPublisher = publisherService.addPublisher(publisher);
-        return ResponseEntity.ok(savedPublisher);
+        URI location = URI.create("/api/publishers/" + savedPublisher.getId());
+        return ResponseEntity.created(location).body(savedPublisher);
     }
 
     @PutMapping("/{id}")

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -45,7 +46,8 @@ public class BoardgameController {
             @Valid @RequestBody BoardgameRequestDTO boardgameRequestDTO) {
         Boardgame boardgame = boardgameDTOMapper.toEntity(boardgameRequestDTO);
         Boardgame savedBoardgame = boardgameService.addBoardgame(boardgame);
-        return ResponseEntity.status(201).body(boardgameDTOMapper.toResponseDTO(savedBoardgame));
+        URI location = URI.create("/api/boardgames/" + savedBoardgame.getId());
+        return ResponseEntity.created(location).body(boardgameDTOMapper.toResponseDTO(savedBoardgame));
     }
 
     @PutMapping("/{id}")

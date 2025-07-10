@@ -11,7 +11,10 @@ import com.meepleconnect.boardgamesapi.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -63,5 +66,36 @@ public class ReservationService {
             throw new GameNotFoundException("Reservation with ID " + reservationId + " wasn't found.");
         }
         reservationRepository.deleteById(reservationId);
+    }
+
+    public long getTotalReservationsCount() {
+        return reservationRepository.count();
+    }
+
+    public long getActiveReservationsCount() {
+        return reservationRepository.findAll().stream()
+                .filter(reservation -> reservation.getReservationDate().isAfter(LocalDate.now()))
+                .count();
+    }
+
+    public Map<String, Object> getMonthlyReservations(int year, int month) {
+        Map<String, Object> monthlyStats = new HashMap<>();
+        YearMonth yearMonth = YearMonth.of(year, month);
+        LocalDate startDate = yearMonth.atDay(1);
+        LocalDate endDate = yearMonth.atEndOfMonth();
+
+        List<Reservation> monthlyReservations = reservationRepository.findAll().stream()
+                .filter(reservation -> !reservation.getReservationDate().isBefore(startDate) &&
+                        !reservation.getReservationDate().isAfter(endDate))
+                .toList();
+
+        monthlyStats.put("year", year);
+        monthlyStats.put("month", month);
+        monthlyStats.put("totalReservations", monthlyReservations.size());
+        monthlyStats.put("totalParticipants", monthlyReservations.stream()
+                .mapToInt(Reservation::getParticipantCount)
+                .sum());
+
+        return monthlyStats;
     }
 }

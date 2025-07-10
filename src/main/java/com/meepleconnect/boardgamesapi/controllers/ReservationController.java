@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -48,7 +49,8 @@ public class ReservationController {
                 reservationRequestDTO.getReservationDate(),
                 reservationRequestDTO.getParticipantCount(),
                 reservationRequestDTO.getNotes());
-        return ResponseEntity.ok(reservation);
+        URI location = URI.create("/api/reservations/" + reservation.getId());
+        return ResponseEntity.created(location).body(reservation);
     }
 
     @DeleteMapping("/{reservationId}")
