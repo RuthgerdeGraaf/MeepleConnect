@@ -1,32 +1,41 @@
 # **MeepleConnect - Installation Guide**
 
 ## **Table of Contents**
+
 1. Introduction
 2. Prerequisites
 3. Installation Steps
 4. Test Users and Roles
 5. Postman Collection
-6. REST Endpoints
+6. Complete REST Endpoints Documentation
+7. Troubleshooting
 
 ---
 
 ## **1. Introduction**
 
-**MeepleConnect** is a web API specifically designed for board game stores. The system offers the following core functionalities:
+**MeepleConnect** is a comprehensive web API designed for board game stores. The system offers advanced functionalities for both customers and staff:
 
 - **Customers** can:
+
   - View and reserve board games for play sessions
   - Express interest in purchasing games
   - Manage their own reservations
+  - Write reviews and ratings
+  - Receive notifications
 
 - **Staff** can:
   - Manage the board game inventory
   - Schedule play sessions
   - Process reservations
   - Manage customer data
+  - View analytics and reports
+  - Send notifications
 
 **Technologies Used:**
+
 - **Backend:**
+
   - Java 17
   - Spring Boot (version 3.x)
   - Spring Security with JWT authentication
@@ -55,148 +64,249 @@ Ensure that the following tools are installed on your system:
 ## **3. Installation Steps**
 
 ### 📥 **1. Clone the repository:**
+
 ```bash
 git clone https://github.com/RuthgerdeGraaf/MeepleConnect.git
 cd MeepleConnect
 ```
 
 ### ⚙️ **2. Configure the database:**
-1. Create a PostgreSQL database:
+
+1. **Install PostgreSQL** if not already installed
+2. **Create a PostgreSQL database:**
    ```sql
    CREATE DATABASE meepleconnect;
    ```
-2. Update databasereferenties in `application.properties`:
+3. **Update database credentials in `application.properties`:**
+
    ```properties
    spring.datasource.url=jdbc:postgresql://localhost:5432/meepleconnect
    spring.datasource.username=postgres
-   spring.datasource.password=password
+   spring.datasource.password=YOUR_POSTGRES_PASSWORD
    ```
 
+   **⚠️ IMPORTANT:** Replace `YOUR_POSTGRES_PASSWORD` with your actual PostgreSQL password!
+
 ### 🛠️ **3. Install dependencies and run migrations:**
+
 ```bash
 ./mvn clean install
 ```
 
 ### 🚀 **4. Start the application:**
+
 ```bash
 ./mvn spring-boot:run
 ```
 
 The web API will be available at:
+
 ```
 http://localhost:8080
 ```
+
+### ✅ **5. Verify installation:**
+
+Test if the API is running by visiting:
+
+```
+http://localhost:8080/api/health
+```
+
+You should see a JSON response with the API status.
 
 ---
 
 ## **4. Test Users and Roles**
 
-| **Username** | **Password** | **Role**    |
-|--------------|--------------|-------------|
-| admin        | admin123     | EMPLOYEE    |
-| klant1       | klant123     | CUSTOMER    |
+The application automatically creates these users on first startup:
 
-- **EMPLOYEE** → Can manage games, play sessions, and reservations.
-- **CUSTOMER** → Can view games, make reservations, and express interest in purchasing.
+| **Username** | **Password**  | **Role**    | **Description**             |
+| ------------ | ------------- | ----------- | --------------------------- |
+| **Ruthger**  | `password123` | ADMIN, USER | Full access to all features |
+| **Edwin**    | `password123` | USER        | Customer access only        |
+
+- **ADMIN** → Full CRUD capabilities (Board Games, Users, Reservations, Analytics)
+- **USER** → Can make reservations, view games, write reviews, manage own profile
 
 ---
 
 ## **5. Postman Collection**
 
-The **Postman collection** contains all important API requests:
+The **complete Postman collection** contains all API endpoints:
 
-1. **Login Endpoint** → Generates JWT-token
-2. **CRUD operations for Board Games**
-3. **Manage Reservations**
-4. **Schedule Play Sessions**
+1. **Authentication** → Login and registration
+2. **Users** → Complete user management
+3. **Boardgames** → Full CRUD operations
+4. **Reservations** → Reservation management
+5. **Publishers** → Publisher management
+6. **Statistics** → Dashboard and analytics
+7. **Search** → Advanced search functionality
+8. **Notifications** → Notification system
+9. **Reviews** → Review and rating system
+10. **Analytics** → Business intelligence
+11. **Health** → API monitoring
+12. **Files** → File upload/download
 
-➡️ **Import the provided Postman collection ([MeepleConnect.postman_collection.json](./MeepleConnect.postman_collection.json)) in Postman.**
+➡️ **Import the provided Postman collection ([MeepleConnect_API_Collection.json](./MeepleConnect_API_Collection.json)) in Postman.**
+
+**Setup Postman:**
+
+1. Import the collection
+2. Set the `baseUrl` variable to `http://localhost:8080`
+3. Use the login requests to get a JWT token
+4. The token will automatically be used in subsequent requests
 
 ---
 
-## **6. REST Endpoints**
+## **6. Complete REST Endpoints Documentation**
 
 ### 🔑 **Authentication**
 
 **POST** `/api/auth/login`
+
 ```json
 {
-  "username": "admin",
-  "password": "admin123"
+  "username": "Ruthger",
+  "password": "password123"
 }
 ```
+
 ➡️ **Response:** JWT token
 
-This is the endpoint used to authenticate users and generate a JWT token. The token is required for subsequent requests to protected endpoints.
+### 👥 **User Management**
 
----
+**GET** `/api/users` → Get all users _(ADMIN only)_
+**GET** `/api/users/{id}` → Get user by ID
+**POST** `/api/users/register` → Register new user
+**PUT** `/api/users/{id}` → Update user _(ADMIN only)_
+**DELETE** `/api/users/{id}` → Delete user _(ADMIN only)_
 
 ### 🎲 **Board Game Management**
 
-**GET** `/api/boardgames` → Retrieves all board games
-
-**POST** `/api/boardgames` *(EMPLOYEE only)*
-```json
-{
-  "name": "Catan",
-  "genre": "Strategy",
-  "players": 4,
-  "price": 29.99
-}
-```
-
-**PUT** `/api/boardgames/{id}` → Update a board game *(EMPLOYEE only)*
-
-**DELETE** `/api/boardgames/{id}` → Delete a board game *(EMPLOYEE only)*
-
----
+**GET** `/api/boardgames` → Get all board games (with optional filters)
+**GET** `/api/boardgames/{id}` → Get board game by ID
+**POST** `/api/boardgames` → Add new board game _(ADMIN only)_
+**PUT** `/api/boardgames/{id}` → Update board game _(ADMIN only)_
+**DELETE** `/api/boardgames/{id}` → Delete board game _(ADMIN only)_
 
 ### 📅 **Reservations**
 
-**POST** `/api/reservations` *(CUSTOMER only)*
-```json
-{
-  "boardgameId": 1,
-  "reservationDate": "2024-03-01"
-}
-```
+**GET** `/api/reservations` → Get all reservations _(ADMIN only)_
+**GET** `/api/reservations/customer/{customerId}` → Get reservations by customer
+**GET** `/api/reservations/boardgame/{boardgameId}` → Get reservations by board game
+**POST** `/api/reservations` → Create new reservation
+**DELETE** `/api/reservations/{id}` → Cancel reservation
 
-**GET** `/api/reservations/customer/{customerId}` → Retrieve all reservations for a customer
+### 🏢 **Publishers**
 
-**DELETE** `/api/reservations/{reservationId}` → Delete a reservation *(CUSTOMER for own reservations, EMPLOYEE for all)*
+**GET** `/api/publishers` → Get all publishers
+**GET** `/api/publishers/{id}` → Get publisher by ID
+**GET** `/api/publishers/country/{country}` → Get publishers by country
+**POST** `/api/publishers` → Add new publisher _(ADMIN only)_
+**PUT** `/api/publishers/{id}` → Update publisher _(ADMIN only)_
+**DELETE** `/api/publishers/{id}` → Delete publisher _(ADMIN only)_
+
+### 📊 **Statistics**
+
+**GET** `/api/statistics/dashboard` → Get dashboard statistics
+**GET** `/api/statistics/boardgames/popular` → Get popular board games
+**GET** `/api/statistics/reservations/monthly` → Get monthly reservations
+
+### 🔍 **Search**
+
+**POST** `/api/search/boardgames` → Search board games with JSON criteria
+**POST** `/api/search/boardgames/advanced` → Advanced search with multiple filters
+
+### 🔔 **Notifications**
+
+**GET** `/api/notifications` → Get all notifications
+**GET** `/api/notifications/{id}` → Get notification by ID
+**POST** `/api/notifications` → Create new notification
+**PUT** `/api/notifications/{id}/read` → Mark notification as read
+**DELETE** `/api/notifications/{id}` → Delete notification
+**GET** `/api/notifications/unread/count` → Get unread count
+**POST** `/api/notifications/broadcast` → Send broadcast notification _(ADMIN only)_
+
+### ⭐ **Reviews**
+
+**GET** `/api/reviews` → Get all reviews
+**GET** `/api/reviews/{id}` → Get review by ID
+**GET** `/api/reviews/boardgame/{boardgameId}` → Get reviews by board game
+**POST** `/api/reviews` → Create new review
+**PUT** `/api/reviews/{id}` → Update review
+**DELETE** `/api/reviews/{id}` → Delete review
+**GET** `/api/reviews/boardgame/{boardgameId}/average-rating` → Get average rating
+**POST** `/api/reviews/{id}/helpful` → Mark review as helpful
+
+### 📈 **Analytics**
+
+**GET** `/api/analytics/revenue/forecast` → Get revenue forecast
+**GET** `/api/analytics/boardgames/performance` → Get board game performance
+**GET** `/api/analytics/customer/insights` → Get customer insights
+**GET** `/api/analytics/trends/seasonal` → Get seasonal trends
+
+### 🏥 **Health & Monitoring**
+
+**GET** `/api/health` → Get API health status
+**GET** `/api/health/ping` → Ping test
+**GET** `/api/health/ready` → Readiness check
+
+### 📁 **File Management**
+
+**POST** `/api/files/upload` → Upload file _(ADMIN only)_
+**GET** `/api/files/{filename}` → Download file
+
+### 🎮 **Fun & Easter Eggs**
+
+**GET** `/api/fun/teapot` → I'm a teapot response (418 status)
+**GET** `/api/fun/boardgames/418` → Special teapot board game
 
 ---
 
-### 📄 **Endpoint Security:**
+## **7. Troubleshooting**
 
-- **JWT Authentication** → Required for all endpoints except `/api/auth/login`.
-- Once the user logs in and receives the JWT token, it must be included in the Authorization header for subsequent requests.
+### **Database Connection Issues:**
 
-**Roles:**
-- **EMPLOYEE** → Full CRUD capabilities (Board Games, Play Sessions, Reservations)
-- **CUSTOMER** → Access only to their own reservations and limited CRUD capabilities
+- Verify PostgreSQL is running
+- Check database credentials in `application.properties`
+- Ensure database `meepleconnect` exists
 
-**JWT Authentication Process:**
-1. **Login:** A user logs in using the `/api/auth/login` endpoint with valid credentials (username and password). If successful, the server responds with a JWT token.
-2. **Token Usage:** The received JWT token must be included in the Authorization header as a Bearer token in all subsequent requests to protected endpoints.
-3. **Role-based Access:**
-   - **EMPLOYEE:** Can perform full CRUD operations on board games, schedule play sessions, and manage reservations
-   - **CUSTOMER:** Can make reservations and view their own reservations. They cannot manage board games or schedule play sessions
-4. **Request with JWT token:** Each protected endpoint checks the validity of the token and ensures the user has the appropriate role for the action
+### **Port Already in Use:**
 
-**Example of a protected request with JWT token:**
+- Change port in `application.properties`:
+  ```properties
+  server.port=8081
+  ```
 
-**POST** `/api/boardgames`
-```json
-{
-  "name": "Catan",
-  "genre": "Strategy",
-  "players": 4,
-  "price": 29.99
-}
-```
+### **JWT Token Issues:**
 
-**Header:**
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.S7J5KHkl_-Cj0w8rJ0yHnp1lmUQd7-TtdR6qZ-hOocI4
-```
+- Ensure you're using the correct login credentials
+- Check that the Authorization header format is: `Bearer <token>`
+
+### **Permission Denied:**
+
+- Verify user has the correct role for the endpoint
+- Check JWT token is valid and not expired
+
+### **Common Error Codes:**
+
+- **401 Unauthorized** → Invalid or missing JWT token
+- **403 Forbidden** → Insufficient permissions
+- **404 Not Found** → Resource doesn't exist
+- **400 Bad Request** → Invalid request data
+- **418 I'm a Teapot** → Easter egg response
+
+---
+
+## **🎯 Quick Start Guide**
+
+1. **Setup Database:** Create PostgreSQL database and update credentials
+2. **Start Application:** Run `./mvn spring-boot:run`
+3. **Import Postman Collection:** Import the provided JSON file
+4. **Login:** Use Ruthger/password123 to get JWT token
+5. **Test Endpoints:** Start with `/api/health` and `/api/boardgames`
+
+**API Base URL:** `http://localhost:8080`
+
+**Swagger Documentation:** `http://localhost:8080/swagger-ui/index.html` (if enabled)
