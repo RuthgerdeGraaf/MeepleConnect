@@ -25,7 +25,7 @@ public class ExceptionController {
     /**
      * Error response structure
      */
-    private static class ErrorResponse {
+    public static class ErrorResponse {
         private final String error;
         private final String message;
         private final LocalDateTime timestamp;
