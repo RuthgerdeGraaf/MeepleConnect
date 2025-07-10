@@ -31,9 +31,8 @@ public class AnalyticsController {
     public ResponseEntity<Map<String, Object>> getRevenueForecast(@RequestParam int months) {
         Map<String, Object> forecast = new HashMap<>();
 
-        // Simuleer revenue forecast op basis van reserveringen
-        double baseRevenue = 50.0; // Gemiddelde prijs per reservering
-        double growthRate = 1.1; // 10% groei per maand
+        double baseRevenue = 50.0;
+        double growthRate = 1.1;
 
         Map<String, Double> monthlyForecast = new HashMap<>();
         for (int i = 1; i <= months; i++) {
@@ -52,7 +51,6 @@ public class AnalyticsController {
     public ResponseEntity<Map<String, Object>> getBoardgamePerformance() {
         Map<String, Object> performance = new HashMap<>();
 
-        // Simuleer performance metrics
         Map<String, Object> metrics = new HashMap<>();
         metrics.put("mostReservedGame", "Catan");
         metrics.put("leastReservedGame", "Chess");
@@ -70,7 +68,6 @@ public class AnalyticsController {
     public ResponseEntity<Map<String, Object>> getCustomerInsights() {
         Map<String, Object> insights = new HashMap<>();
 
-        // Simuleer customer insights
         Map<String, Object> customerData = new HashMap<>();
         customerData.put("totalCustomers", userService.getTotalUsersCount());
         customerData.put("activeCustomers", userService.getTotalUsersCount() * 0.75);
@@ -88,7 +85,6 @@ public class AnalyticsController {
     public ResponseEntity<Map<String, Object>> getSeasonalTrends(@RequestParam int year) {
         Map<String, Object> trends = new HashMap<>();
 
-        // Simuleer seizoensgebonden trends
         Map<String, Integer> seasonalData = new HashMap<>();
         seasonalData.put("Winter", 45);
         seasonalData.put("Spring", 38);
