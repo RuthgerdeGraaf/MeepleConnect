@@ -17,7 +17,6 @@ public class NotificationController {
     public ResponseEntity<List<Map<String, Object>>> getAllNotifications() {
         List<Map<String, Object>> notifications = new ArrayList<>();
 
-        // Simuleer enkele notificaties
         Map<String, Object> notification1 = new HashMap<>();
         notification1.put("id", 1L);
         notification1.put("type", "RESERVATION_REMINDER");
@@ -65,7 +64,7 @@ public class NotificationController {
         String priority = (String) notificationRequest.get("priority");
 
         Map<String, Object> newNotification = new HashMap<>();
-        newNotification.put("id", System.currentTimeMillis()); // Simuleer ID
+        newNotification.put("id", System.currentTimeMillis());
         newNotification.put("type", type);
         newNotification.put("title", title);
         newNotification.put("message", message);
@@ -110,7 +109,7 @@ public class NotificationController {
         response.put("broadcastId", System.currentTimeMillis());
         response.put("message", message);
         response.put("priority", priority);
-        response.put("recipients", 150); // Simuleer aantal ontvangers
+        response.put("recipients", 150);
         response.put("sentAt", LocalDateTime.now());
 
         return ResponseEntity.status(201).body(response);

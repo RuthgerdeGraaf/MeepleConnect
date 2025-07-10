@@ -17,7 +17,6 @@ public class ReviewController {
     public ResponseEntity<List<Map<String, Object>>> getAllReviews() {
         List<Map<String, Object>> reviews = new ArrayList<>();
 
-        // Simuleer enkele reviews
         Map<String, Object> review1 = new HashMap<>();
         review1.put("id", 1L);
         review1.put("boardgameId", 1L);
@@ -66,7 +65,6 @@ public class ReviewController {
     public ResponseEntity<List<Map<String, Object>>> getReviewsByBoardgame(@PathVariable Long boardgameId) {
         List<Map<String, Object>> reviews = new ArrayList<>();
 
-        // Simuleer reviews voor specifiek bordspel
         Map<String, Object> review = new HashMap<>();
         review.put("id", 1L);
         review.put("boardgameId", boardgameId);
@@ -93,7 +91,7 @@ public class ReviewController {
         Map<String, Object> newReview = new HashMap<>();
         newReview.put("id", System.currentTimeMillis());
         newReview.put("boardgameId", boardgameId);
-        newReview.put("boardgameName", "Catan"); // Simuleer naam
+        newReview.put("boardgameName", "Catan");
         newReview.put("userId", userId);
         newReview.put("username", "User" + userId);
         newReview.put("rating", rating);
@@ -151,7 +149,7 @@ public class ReviewController {
     public ResponseEntity<Map<String, Object>> markAsHelpful(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
         response.put("id", id);
-        response.put("helpfulCount", 13); // Verhoogd van 12 naar 13
+        response.put("helpfulCount", 13);
         response.put("markedAt", LocalDateTime.now());
 
         return ResponseEntity.ok(response);
