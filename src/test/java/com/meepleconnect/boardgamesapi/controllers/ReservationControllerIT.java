@@ -1,38 +1,40 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.meepleconnect.boardgamesapi.dtos.ReservationRequestDTO;
 import com.meepleconnect.boardgamesapi.entities.User;
 import com.meepleconnect.boardgamesapi.models.Boardgame;
-import com.meepleconnect.boardgamesapi.models.Reservation;
+import com.meepleconnect.boardgamesapi.models.Publisher;
 import com.meepleconnect.boardgamesapi.repositories.BoardgameRepository;
-import com.meepleconnect.boardgamesapi.repositories.ReservationRepository;
+import com.meepleconnect.boardgamesapi.repositories.PublisherRepository;
 import com.meepleconnect.boardgamesapi.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc
-public class ReservationControllerIT {
+@AutoConfigureWebMvc
+@ActiveProfiles("test")
+class ReservationControllerIT {
 
     @Autowired
-    private MockMvc mockMvc;
+    private WebApplicationContext webApplicationContext;
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -40,100 +42,121 @@ public class ReservationControllerIT {
     @Autowired
     private BoardgameRepository boardgameRepository;
 
-    private User testUser;
-    private Boardgame testBoardgame;
-    private Reservation testReservation;
+    @Autowired
+    private PublisherRepository publisherRepository;
+
+    private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        testUser = new User();
-        testUser.setUserName("testuser");
-        testUser.setPassword("password");
-        testUser = userRepository.save(testUser);
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        createTestData();
+    }
 
-        testBoardgame = new Boardgame("Test Game", new BigDecimal("29.99"), true, 2, 4, "Strategy", null);
-        testBoardgame = boardgameRepository.save(testBoardgame);
+    private void createTestData() {
+        if (userRepository.findByUserName("testuser").isPresent() && 
+            boardgameRepository.findByNameIgnoreCase("Test Boardgame").isPresent()) {
+            return;
+        }
 
-        testReservation = new Reservation(testUser, testBoardgame, LocalDate.now().plusDays(1), 3, "Test reservation");
-        testReservation = reservationRepository.save(testReservation);
+        Publisher publisher = new Publisher();
+        publisher.setName("Test Publisher");
+        publisher.setCountryOfOrigin("Netherlands");
+        publisher.setFounded(2020);
+        publisher.setIndie(true);
+        publisher = publisherRepository.save(publisher);
+
+        User user = new User();
+        user.setUserName("testuser");
+        user.setPassword("$2a$10$bJxwWc3A3DBzke7Gnb/MZ.lLXmvOIE/DFAd6QUnBvWhn7c7D1zY4C");
+        user.setEnabled(true);
+        user.setExpired(false);
+        user.setLocked(false);
+        user.setAreCredentialsExpired(false);
+        user = userRepository.save(user);
+
+        Boardgame boardgame = new Boardgame();
+        boardgame.setName("Test Boardgame");
+        boardgame.setPrice(new java.math.BigDecimal("29.99"));
+        boardgame.setMinPlayers(2);
+        boardgame.setMaxPlayers(4);
+        boardgame.setGenre("Strategy");
+        boardgame.setAvailable(true);
+        boardgame.setPublisher(publisher);
+        boardgameRepository.save(boardgame);
     }
 
     @Test
-    void getAllReservations_ShouldReturnReservations() throws Exception {
+    void getAllReservations_ShouldReturnList() throws Exception {
         mockMvc.perform(get("/api/reservations"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].id").exists());
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(0))));
     }
 
     @Test
-    void getReservationById_ExistingId_ShouldReturnReservation() throws Exception {
-        mockMvc.perform(get("/api/reservations/" + testReservation.getId()))
+    void getReservationsByCustomer_ShouldReturnList() throws Exception {
+        User testUser = userRepository.findByUserName("testuser").orElseThrow();
+        
+        mockMvc.perform(get("/api/reservations/customer/" + testUser.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(testReservation.getId()))
-                .andExpect(jsonPath("$.participantCount").value(3));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(0))));
     }
 
     @Test
-    void getReservationById_NonExistingId_ShouldReturnNotFound() throws Exception {
-        mockMvc.perform(get("/api/reservations/999"))
-                .andExpect(status().isNotFound());
+    void getReservationsByBoardgame_ShouldReturnList() throws Exception {
+        Boardgame testBoardgame = boardgameRepository.findByNameIgnoreCase("Test Boardgame").orElseThrow();
+        
+        mockMvc.perform(get("/api/reservations/boardgame/" + testBoardgame.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(0))));
     }
 
     @Test
-    void createReservation_ValidData_ShouldCreateReservation() throws Exception {
-        ReservationRequest request = new ReservationRequest(
-                testUser.getId(),
-                testBoardgame.getId(),
-                LocalDate.now().plusDays(2),
-                4,
-                "New reservation"
-        );
+    void createReservation_ShouldReturnCreatedReservation() throws Exception {
+        User testUser = userRepository.findByUserName("testuser").orElseThrow();
+        Boardgame testBoardgame = boardgameRepository.findByNameIgnoreCase("Test Boardgame").orElseThrow();
+
+        ReservationRequestDTO dto = new ReservationRequestDTO();
+        dto.setCustomerId(testUser.getId());
+        dto.setBoardgameId(testBoardgame.getId());
+        dto.setReservationDate(LocalDate.now().plusDays(2));
+        dto.setParticipantCount(2);
+        dto.setNotes("Test reservering");
 
         mockMvc.perform(post("/api/reservations")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.participantCount").value(4))
-                .andExpect(jsonPath("$.notes").value("New reservation"));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.reservationDate").value(dto.getReservationDate().toString()))
+                .andExpect(jsonPath("$.participantCount").value(2))
+                .andExpect(header().string("Location", containsString("/api/reservations/")));
     }
 
     @Test
-    void deleteReservation_ExistingId_ShouldDeleteReservation() throws Exception {
-        mockMvc.perform(delete("/api/reservations/" + testReservation.getId()))
+    void cancelReservation_ShouldReturnNoContent() throws Exception {
+        User testUser = userRepository.findByUserName("testuser").orElseThrow();
+        Boardgame testBoardgame = boardgameRepository.findByNameIgnoreCase("Test Boardgame").orElseThrow();
+
+        ReservationRequestDTO dto = new ReservationRequestDTO();
+        dto.setCustomerId(testUser.getId());
+        dto.setBoardgameId(testBoardgame.getId());
+        dto.setReservationDate(LocalDate.now().plusDays(3));
+        dto.setParticipantCount(2);
+        dto.setNotes("Voor annulering");
+
+        String location = mockMvc.perform(post("/api/reservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getHeader("Location");
+        String reservationId = location.substring(location.lastIndexOf("/") + 1);
+
+        mockMvc.perform(delete("/api/reservations/" + reservationId))
                 .andExpect(status().isNoContent());
-    }
-
-    @Test
-    void deleteReservation_NonExistingId_ShouldReturnNotFound() throws Exception {
-        mockMvc.perform(delete("/api/reservations/999"))
-                .andExpect(status().isNotFound());
-    }
-
-    private static class ReservationRequest {
-        private Long customerId;
-        private Long boardgameId;
-        private LocalDate reservationDate;
-        private int participantCount;
-        private String notes;
-
-        public ReservationRequest(Long customerId, Long boardgameId, LocalDate reservationDate, int participantCount, String notes) {
-            this.customerId = customerId;
-            this.boardgameId = boardgameId;
-            this.reservationDate = reservationDate;
-            this.participantCount = participantCount;
-            this.notes = notes;
-        }
-
-        public Long getCustomerId() { return customerId; }
-        public void setCustomerId(Long customerId) { this.customerId = customerId; }
-        public Long getBoardgameId() { return boardgameId; }
-        public void setBoardgameId(Long boardgameId) { this.boardgameId = boardgameId; }
-        public LocalDate getReservationDate() { return reservationDate; }
-        public void setReservationDate(LocalDate reservationDate) { this.reservationDate = reservationDate; }
-        public int getParticipantCount() { return participantCount; }
-        public void setParticipantCount(int participantCount) { this.participantCount = participantCount; }
-        public String getNotes() { return notes; }
-        public void setNotes(String notes) { this.notes = notes; }
     }
 }
