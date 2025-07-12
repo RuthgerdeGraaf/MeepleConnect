@@ -9,6 +9,7 @@ import com.meepleconnect.boardgamesapi.repositories.PublisherRepository;
 import com.meepleconnect.boardgamesapi.repositories.RoleRepository;
 import com.meepleconnect.boardgamesapi.repositories.UserRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
+@ConditionalOnProperty(name = "data.initialization.enabled", havingValue = "true", matchIfMissing = true)
 public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
@@ -51,18 +53,36 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initializeDefaultData() {
-        Role adminRole = new Role();
-        adminRole.setRoleName("ROLE_ADMIN");
-        adminRole.setActive(true);
-        adminRole.setDescription("administrator roles");
-        roleRepository.save(adminRole);
+        // Verwijder alle bestaande users om dubbele of oude referenties te voorkomen
+        userRepository.deleteAll();
 
-        Role userRole = new Role();
-        userRole.setRoleName("ROLE_USER");
-        userRole.setActive(true);
-        userRole.setDescription("user roles");
-        roleRepository.save(userRole);
+        // Maak rollen aan of haal ze op als ze al bestaan
+        Role adminRole = roleRepository.findAll().stream()
+                .filter(r -> "ROLE_ADMIN".equals(r.getRoleName()))
+                .findFirst()
+                .orElseGet(() -> {
+                    Role role = new Role();
+                    role.setRoleName("ROLE_ADMIN");
+                    role.setActive(true);
+                    role.setDescription("administrator roles");
+                    return roleRepository.save(role);
+                });
+        Role userRole = roleRepository.findAll().stream()
+                .filter(r -> "ROLE_USER".equals(r.getRoleName()))
+                .findFirst()
+                .orElseGet(() -> {
+                    Role role = new Role();
+                    role.setRoleName("ROLE_USER");
+                    role.setActive(true);
+                    role.setDescription("user roles");
+                    return roleRepository.save(role);
+                });
 
+        // Haal altijd verse, managed instanties op uit de repository
+        adminRole = roleRepository.findById(adminRole.getId()).orElseThrow();
+        userRole = roleRepository.findById(userRole.getId()).orElseThrow();
+
+        // Koppel alleen verse instanties aan de gebruiker
         User ruthger = new User();
         ruthger.setUserName("Ruthger");
         ruthger.setPassword(passwordEncoder.encode("password123"));
@@ -212,37 +232,27 @@ public class DataInitializer implements CommandLineRunner {
         chess.setPublisher(chessHouse);
         boardgameRepository.save(chess);
 
-        Boardgame codenames = new Boardgame();
-        codenames.setName("Codenames");
-        codenames.setPrice(new BigDecimal("24.99"));
-        codenames.setAvailable(true);
-        codenames.setMinPlayers(2);
-        codenames.setMaxPlayers(8);
-        codenames.setGenre("Party");
-        codenames.setPublisher(czechGames);
-        boardgameRepository.save(codenames);
+        Boardgame alchemists = new Boardgame();
+        alchemists.setName("Alchemists");
+        alchemists.setPrice(new BigDecimal("59.99"));
+        alchemists.setAvailable(true);
+        alchemists.setMinPlayers(2);
+        alchemists.setMaxPlayers(4);
+        alchemists.setGenre("Strategy");
+        alchemists.setPublisher(czechGames);
+        boardgameRepository.save(alchemists);
 
-        Boardgame starWars = new Boardgame();
-        starWars.setName("Star Wars: Rebellion");
-        starWars.setPrice(new BigDecimal("89.99"));
-        starWars.setAvailable(true);
-        starWars.setMinPlayers(2);
-        starWars.setMaxPlayers(4);
-        starWars.setGenre("Strategy");
-        starWars.setPublisher(fantasyFlight);
-        boardgameRepository.save(starWars);
-
-        Boardgame settlers = new Boardgame();
-        settlers.setName("The Settlers of Catan");
-        settlers.setPrice(new BigDecimal("42.99"));
-        settlers.setAvailable(true);
-        settlers.setMinPlayers(3);
-        settlers.setMaxPlayers(4);
-        settlers.setGenre("Strategy");
-        settlers.setPublisher(mayfair);
-        boardgameRepository.save(settlers);
+        Boardgame arkhamHorror = new Boardgame();
+        arkhamHorror.setName("Arkham Horror");
+        arkhamHorror.setPrice(new BigDecimal("69.99"));
+        arkhamHorror.setAvailable(true);
+        arkhamHorror.setMinPlayers(1);
+        arkhamHorror.setMaxPlayers(8);
+        arkhamHorror.setGenre("Adventure");
+        arkhamHorror.setPublisher(fantasyFlight);
+        boardgameRepository.save(arkhamHorror);
 
         System.out.println(
-                "✅ Standard boardgames created: Catan, Ticket to Ride, Pandemic, Monopoly, Chess, Codenames, Star Wars: Rebellion, The Settlers of Catan");
+                "✅ Boardgames created: Catan, Ticket to Ride, Pandemic, Monopoly, Chess, Alchemists, Arkham Horror");
     }
 }
