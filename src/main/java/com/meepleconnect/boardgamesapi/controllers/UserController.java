@@ -1,48 +1,62 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
+import com.meepleconnect.boardgamesapi.dtos.UserDTOMapper;
+import com.meepleconnect.boardgamesapi.dtos.UserRequestDTO;
+import com.meepleconnect.boardgamesapi.dtos.UserResponseDTO;
 import com.meepleconnect.boardgamesapi.entities.User;
 import com.meepleconnect.boardgamesapi.services.UserService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
+    private final UserDTOMapper userDTOMapper;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserDTOMapper userDTOMapper) {
         this.userService = userService;
+        this.userDTOMapper = userDTOMapper;
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         List<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+        List<UserResponseDTO> userResponseDTOs = users.stream()
+                .map(userDTOMapper::mapToResponseDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userResponseDTOs);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
+        UserResponseDTO userResponseDTO = userDTOMapper.mapToResponseDTO(user);
+        return ResponseEntity.ok(userResponseDTO);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@Valid @RequestBody User user) {
+    public ResponseEntity<UserResponseDTO> registerUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {
+        User user = userDTOMapper.mapToModel(userRequestDTO);
         User registeredUser = userService.registerUser(user);
+        UserResponseDTO userResponseDTO = userDTOMapper.mapToResponseDTO(registeredUser);
         URI location = URI.create("/api/users/" + registeredUser.getId());
-        return ResponseEntity.created(location).body(registeredUser);
+        return ResponseEntity.created(location).body(userResponseDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id,
+            @Valid @RequestBody UserRequestDTO userRequestDTO) {
+        User user = userDTOMapper.mapToModel(userRequestDTO);
         User updatedUser = userService.updateUser(id, user);
-        return ResponseEntity.ok(updatedUser);
+        UserResponseDTO userResponseDTO = userDTOMapper.mapToResponseDTO(updatedUser);
+        return ResponseEntity.ok(userResponseDTO);
     }
 
     @DeleteMapping("/{id}")

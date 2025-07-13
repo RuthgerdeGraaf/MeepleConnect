@@ -51,7 +51,6 @@ class BoardgameControllerIT {
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         
-        // Create test publisher
         testPublisher = new Publisher();
         testPublisher.setName("Test Publisher");
         testPublisher.setCountryOfOrigin("Netherlands");
@@ -59,7 +58,6 @@ class BoardgameControllerIT {
         testPublisher.setIndie(true);
         testPublisher = publisherRepository.save(testPublisher);
 
-        // Create test boardgame
         testBoardgame = new Boardgame();
         testBoardgame.setName("Test Game");
         testBoardgame.setPrice(new BigDecimal("29.99"));
@@ -73,7 +71,6 @@ class BoardgameControllerIT {
 
     @Test
     void getAllBoardgames_ShouldReturnAllBoardgames() throws Exception {
-        // Create additional boardgame
         Boardgame secondGame = new Boardgame();
         secondGame.setName("Second Game");
         secondGame.setPrice(new BigDecimal("39.99"));
@@ -103,7 +100,6 @@ class BoardgameControllerIT {
 
     @Test
     void getAllBoardgames_WithGenreFilter_ShouldReturnFilteredBoardgames() throws Exception {
-        // Create boardgame with different genre
         Boardgame familyGame = new Boardgame();
         familyGame.setName("Family Game");
         familyGame.setPrice(new BigDecimal("19.99"));
@@ -124,7 +120,6 @@ class BoardgameControllerIT {
 
     @Test
     void getAllBoardgames_WithAvailableFilter_ShouldReturnFilteredBoardgames() throws Exception {
-        // Create unavailable boardgame
         Boardgame unavailableGame = new Boardgame();
         unavailableGame.setName("Unavailable Game");
         unavailableGame.setPrice(new BigDecimal("49.99"));
@@ -145,7 +140,6 @@ class BoardgameControllerIT {
 
     @Test
     void getAllBoardgames_WithMinPlayersFilter_ShouldReturnFilteredBoardgames() throws Exception {
-        // Create boardgame with higher min players
         Boardgame highPlayerGame = new Boardgame();
         highPlayerGame.setName("High Player Game");
         highPlayerGame.setPrice(new BigDecimal("59.99"));
@@ -166,7 +160,6 @@ class BoardgameControllerIT {
 
     @Test
     void getAllBoardgames_WithMaxPlayersFilter_ShouldReturnFilteredBoardgames() throws Exception {
-        // Create boardgame with lower max players
         Boardgame lowPlayerGame = new Boardgame();
         lowPlayerGame.setName("Low Player Game");
         lowPlayerGame.setPrice(new BigDecimal("15.99"));
@@ -187,7 +180,6 @@ class BoardgameControllerIT {
 
     @Test
     void getAllBoardgames_WithMultipleFilters_ShouldReturnFilteredBoardgames() throws Exception {
-        // Create boardgame matching multiple filters
         Boardgame filteredGame = new Boardgame();
         filteredGame.setName("Filtered Game");
         filteredGame.setPrice(new BigDecimal("25.99"));
@@ -258,7 +250,6 @@ class BoardgameControllerIT {
                 .andExpect(jsonPath("$.genre").value("Adventure"))
                 .andExpect(jsonPath("$.publisher.id").value(testPublisher.getId()));
 
-        // Verify boardgame was saved
         List<Boardgame> boardgames = boardgameRepository.findAll();
         assertThat(boardgames).hasSize(2);
         assertThat(boardgames.stream().anyMatch(bg -> bg.getName().equals("New Game"))).isTrue();
@@ -425,7 +416,6 @@ class BoardgameControllerIT {
                 .andExpect(jsonPath("$.maxPlayers").value(8))
                 .andExpect(jsonPath("$.genre").value("Party"));
 
-        // Verify boardgame was updated
         Boardgame updatedBoardgame = boardgameRepository.findById(testBoardgame.getId()).orElse(null);
         assertThat(updatedBoardgame).isNotNull();
         assertThat(updatedBoardgame.getName()).isEqualTo("Updated Game");
@@ -474,7 +464,6 @@ class BoardgameControllerIT {
         mockMvc.perform(delete("/api/boardgames/{id}", testBoardgame.getId()))
                 .andExpect(status().isNoContent());
 
-        // Verify boardgame was deleted
         assertThat(boardgameRepository.findById(testBoardgame.getId())).isEmpty();
     }
 
