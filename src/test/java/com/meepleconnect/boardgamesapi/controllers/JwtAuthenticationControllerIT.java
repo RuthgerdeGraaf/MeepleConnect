@@ -57,7 +57,6 @@ class JwtAuthenticationControllerIT {
     @Test
     @WithMockUser
     void login_WithValidCredentials_ShouldReturnJwtToken() throws Exception {
-        // Arrange
         JwtRequest request = new JwtRequest("testuser", "testpass");
         UserDetails userDetails = new User("testuser", "testpass", new ArrayList<>());
         String expectedToken = "test.jwt.token";
@@ -67,7 +66,6 @@ class JwtAuthenticationControllerIT {
         when(userDetailsService.loadUserByUsername("testuser")).thenReturn(userDetails);
         when(jwtUtil.generateToken("testuser")).thenReturn(expectedToken);
 
-        // Act & Assert
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
@@ -79,13 +77,11 @@ class JwtAuthenticationControllerIT {
     @Test
     @WithMockUser
     void login_WithInvalidCredentials_ShouldReturnUnauthorized() throws Exception {
-        // Arrange
         JwtRequest request = new JwtRequest("testuser", "wrongpass");
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new BadCredentialsException("Bad credentials"));
 
-        // Act & Assert
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
@@ -95,10 +91,8 @@ class JwtAuthenticationControllerIT {
     @Test
     @WithMockUser
     void login_WithEmptyUsername_ShouldReturnBadRequest() throws Exception {
-        // Arrange
         JwtRequest request = new JwtRequest("", "testpass");
 
-        // Act & Assert
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
@@ -108,10 +102,8 @@ class JwtAuthenticationControllerIT {
     @Test
     @WithMockUser
     void login_WithEmptyPassword_ShouldReturnBadRequest() throws Exception {
-        // Arrange
         JwtRequest request = new JwtRequest("testuser", "");
 
-        // Act & Assert
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
@@ -121,10 +113,9 @@ class JwtAuthenticationControllerIT {
     @Test
     @WithMockUser
     void login_WithNullUsername_ShouldReturnBadRequest() throws Exception {
-        // Arrange
+        // Arrnge
         JwtRequest request = new JwtRequest(null, "testpass");
 
-        // Act & Assert
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
@@ -134,10 +125,8 @@ class JwtAuthenticationControllerIT {
     @Test
     @WithMockUser
     void login_WithNullPassword_ShouldReturnBadRequest() throws Exception {
-        // Arrange
         JwtRequest request = new JwtRequest("testuser", null);
 
-        // Act & Assert
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
@@ -147,10 +136,8 @@ class JwtAuthenticationControllerIT {
     @Test
     @WithMockUser
     void login_WithMissingContentType_ShouldReturnUnsupportedMediaType() throws Exception {
-        // Arrange
         JwtRequest request = new JwtRequest("testuser", "testpass");
 
-        // Act & Assert
         mockMvc.perform(post("/api/auth/login")
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnsupportedMediaType());

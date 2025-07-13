@@ -81,7 +81,6 @@ class PublisherControllerIT {
 
     @Test
     void updatePublisher_ShouldReturnUpdatedPublisher() throws Exception {
-        // Eerst een publisher aanmaken met unieke naam
         Publisher newPublisher = new Publisher();
         newPublisher.setName("Publisher to Update " + System.currentTimeMillis());
         newPublisher.setCountryOfOrigin("Original Country");
@@ -96,7 +95,6 @@ class PublisherControllerIT {
 
         String publisherId = location.substring(location.lastIndexOf("/") + 1);
 
-        // Nu de publisher updaten
         Publisher updatedPublisher = new Publisher();
         updatedPublisher.setName("Updated Publisher");
         updatedPublisher.setCountryOfOrigin("Updated Country");

@@ -53,7 +53,6 @@ class AnalyticsControllerIT {
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        // Create test publisher
         testPublisher = new Publisher();
         testPublisher.setName("Test Publisher");
         testPublisher.setCountryOfOrigin("Netherlands");
@@ -61,7 +60,6 @@ class AnalyticsControllerIT {
         testPublisher.setIndie(true);
         testPublisher = publisherRepository.save(testPublisher);
 
-        // Create test user
         Role userRole = new Role();
         userRole.setRoleName("ROLE_USER");
         userRole.setActive(true);
@@ -77,7 +75,6 @@ class AnalyticsControllerIT {
         testUser.setRoles(Arrays.asList(userRole));
         userRepository.save(testUser);
 
-        // Create test boardgames
         Boardgame catan = new Boardgame();
         catan.setName("Catan");
         catan.setPrice(new BigDecimal("39.99"));
@@ -187,14 +184,12 @@ class AnalyticsControllerIT {
                 .andExpect(jsonPath("$.customerInsights.newCustomersThisMonth").value(12))
                 .andExpect(jsonPath("$.generatedAt").value(LocalDate.now().toString()));
 
-        // Verify the total customers matches the actual user count
         long actualUserCount = userRepository.count();
         assertThat(actualUserCount).isGreaterThan(0);
     }
 
     @Test
     void getCustomerInsights_WithMultipleUsers_ShouldReturnCorrectCounts() throws Exception {
-        // Create additional users
         Role userRole = new Role();
         userRole.setRoleName("ROLE_USER");
         userRole.setActive(true);
@@ -326,7 +321,6 @@ class AnalyticsControllerIT {
 
     @Test
     void allAnalyticsEndpoints_ShouldReturnValidJsonStructure() throws Exception {
-        // Test all endpoints return valid JSON structure
         String[] endpoints = {
                 "/api/analytics/revenue/forecast?months=3",
                 "/api/analytics/boardgames/performance",

@@ -86,7 +86,6 @@ class FileControllerIT {
 
         @Test
         void downloadFile_ShouldReturnFileContent() throws Exception {
-                // Eerst uploaden
                 String content = "Download test";
                 MockMultipartFile file = new MockMultipartFile("file", "download.txt", MediaType.TEXT_PLAIN_VALUE,
                                 content.getBytes());
@@ -110,7 +109,6 @@ class FileControllerIT {
 
         @Test
         void downloadFile_InvalidUrl_ShouldReturnNotFound() throws Exception {
-                // Test met een URL-encoded bestandsnaam die niet bestaat
                 mockMvc.perform(get("/api/files/invalid%2Ffile.txt"))
                                 .andExpect(status().isNotFound())
                                 .andExpect(jsonPath("$.error").value("File Not Found"));
@@ -147,7 +145,6 @@ class FileControllerIT {
 
         @AfterAll
         void cleanup() throws IOException {
-                // Verwijder alle testbestanden
                 FileUtils.cleanDirectory(uploadPath.toFile());
         }
 }

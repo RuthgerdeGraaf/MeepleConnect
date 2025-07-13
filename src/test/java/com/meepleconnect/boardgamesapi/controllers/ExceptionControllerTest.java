@@ -28,7 +28,6 @@ class ExceptionControllerTest {
 
     @Test
     void handleValidationException_WithFieldErrors_ShouldReturnBadRequest() {
-        // Arrange
         BindingResult bindingResult = mock(BindingResult.class);
         FieldError fieldError = new FieldError("object", "fieldName", "Field is required");
         when(bindingResult.getFieldErrors()).thenReturn(Collections.singletonList(fieldError));
@@ -36,10 +35,8 @@ class ExceptionControllerTest {
         MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
         when(ex.getBindingResult()).thenReturn(bindingResult);
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController.handleValidationException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("Bad Request");
@@ -49,17 +46,14 @@ class ExceptionControllerTest {
 
     @Test
     void handleValidationException_WithoutFieldErrors_ShouldReturnBadRequest() {
-        // Arrange
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.getFieldErrors()).thenReturn(Collections.emptyList());
 
         MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
         when(ex.getBindingResult()).thenReturn(bindingResult);
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController.handleValidationException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("Bad Request");
@@ -68,14 +62,11 @@ class ExceptionControllerTest {
 
     @Test
     void handleIllegalArgumentException_ShouldReturnBadRequest() {
-        // Arrange
         IllegalArgumentException ex = new IllegalArgumentException("Invalid argument");
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController
                 .handleIllegalArgumentException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("Bad Request");
@@ -84,14 +75,11 @@ class ExceptionControllerTest {
 
     @Test
     void handleGameNotFoundException_ShouldReturnNotFound() {
-        // Arrange
         GameNotFoundException ex = new GameNotFoundException("Game not found");
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController
                 .handleGameNotFoundException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("Game Not Found");
@@ -100,14 +88,11 @@ class ExceptionControllerTest {
 
     @Test
     void handleReservationNotFoundException_ShouldReturnNotFound() {
-        // Arrange
         ReservationNotFoundException ex = new ReservationNotFoundException("Reservation not found");
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController
                 .handleReservationNotFoundException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("Reservation Not Found");
@@ -116,14 +101,11 @@ class ExceptionControllerTest {
 
     @Test
     void handlePublisherNotFoundException_ShouldReturnNotFound() {
-        // Arrange
         PublisherNotFoundException ex = new PublisherNotFoundException("Publisher not found");
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController
                 .handlePublisherNotFoundException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("Publisher Not Found");
@@ -132,14 +114,11 @@ class ExceptionControllerTest {
 
     @Test
     void handleUserNotFoundException_ShouldReturnNotFound() {
-        // Arrange
         UserNotFoundException ex = new UserNotFoundException("User not found");
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController
                 .handleUserNotFoundException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("User Not Found");
@@ -148,14 +127,11 @@ class ExceptionControllerTest {
 
     @Test
     void handleFileNotFoundException_ShouldReturnNotFound() {
-        // Arrange
         FileNotFoundException ex = new FileNotFoundException("File not found");
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController
                 .handleFileNotFoundException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("File Not Found");
@@ -164,13 +140,10 @@ class ExceptionControllerTest {
 
     @Test
     void handleBadRequestException_ShouldReturnBadRequest() {
-        // Arrange
         BadRequestException ex = new BadRequestException("Bad request");
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController.handleBadRequestException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("Bad Request");
@@ -179,13 +152,10 @@ class ExceptionControllerTest {
 
     @Test
     void handleConflictException_ShouldReturnConflict() {
-        // Arrange
         ConflictException ex = new ConflictException("Conflict occurred");
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController.handleConflictException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("Conflict");
@@ -194,13 +164,10 @@ class ExceptionControllerTest {
 
     @Test
     void handleTeapotException_ShouldReturnTeapot() {
-        // Arrange
         TeapotException ex = new TeapotException("I'm a teapot");
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController.handleTeapotException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.I_AM_A_TEAPOT);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("I'm a Teapot");
@@ -209,13 +176,10 @@ class ExceptionControllerTest {
 
     @Test
     void handleFileUploadException_ShouldReturnInternalServerError() {
-        // Arrange
         FileUploadException ex = new FileUploadException("File upload failed");
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController.handleFileUploadException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("File Upload Error");
@@ -224,14 +188,11 @@ class ExceptionControllerTest {
 
     @Test
     void handleMissingServletRequestParameterException_ShouldReturnBadRequest() {
-        // Arrange
         MissingServletRequestParameterException ex = new MissingServletRequestParameterException("paramName", "String");
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController
                 .handleMissingServletRequestParameterException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("Bad Request");
@@ -240,15 +201,12 @@ class ExceptionControllerTest {
 
     @Test
     void handleMethodArgumentTypeMismatchException_ShouldReturnBadRequest() {
-        // Arrange
         MethodArgumentTypeMismatchException ex = mock(MethodArgumentTypeMismatchException.class);
         when(ex.getName()).thenReturn("paramName");
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController
                 .handleMethodArgumentTypeMismatchException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("Bad Request");
@@ -257,13 +215,10 @@ class ExceptionControllerTest {
 
     @Test
     void handleGenericException_ShouldReturnInternalServerError() {
-        // Arrange
         Exception ex = new RuntimeException("Unexpected error");
 
-        // Act
         ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController.handleGenericException(ex);
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getError()).isEqualTo("Internal Server Error");
@@ -272,14 +227,11 @@ class ExceptionControllerTest {
 
     @Test
     void errorResponse_ShouldHaveCorrectStructure() {
-        // Arrange
         String error = "Test Error";
         String message = "Test Message";
 
-        // Act
         ExceptionController.ErrorResponse errorResponse = new ExceptionController.ErrorResponse(error, message);
 
-        // Assert
         assertThat(errorResponse.getError()).isEqualTo(error);
         assertThat(errorResponse.getMessage()).isEqualTo(message);
         assertThat(errorResponse.getTimestamp()).isNotNull();
@@ -288,21 +240,16 @@ class ExceptionControllerTest {
 
     @Test
     void errorResponse_TimestampShouldBeRecent() {
-        // Arrange
         LocalDateTime beforeCreation = LocalDateTime.now().minusSeconds(1);
 
-        // Act
         ExceptionController.ErrorResponse errorResponse = new ExceptionController.ErrorResponse("Error", "Message");
 
-        // Assert
         assertThat(errorResponse.getTimestamp()).isAfter(beforeCreation);
         assertThat(errorResponse.getTimestamp()).isBeforeOrEqualTo(LocalDateTime.now().plusSeconds(1));
     }
 
     @Test
     void allExceptionHandlers_ShouldReturnNonNullResponse() {
-        // Test that all exception handlers return non-null responses
-        // Create proper mock for MethodArgumentNotValidException
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.getFieldErrors()).thenReturn(Collections.emptyList());
         MethodArgumentNotValidException validationEx = mock(MethodArgumentNotValidException.class);
@@ -332,8 +279,6 @@ class ExceptionControllerTest {
 
     @Test
     void allExceptionHandlers_ShouldReturnNonNullBody() {
-        // Test that all exception handlers return responses with non-null body
-        // Create proper mock for MethodArgumentNotValidException
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.getFieldErrors()).thenReturn(Collections.emptyList());
         MethodArgumentNotValidException validationEx = mock(MethodArgumentNotValidException.class);
@@ -369,7 +314,6 @@ class ExceptionControllerTest {
 
     @Test
     void exceptionHandlers_ShouldPreserveExceptionMessage() {
-        // Test that exception messages are preserved in responses
         String testMessage = "Custom test message";
 
         assertThat(exceptionController.handleIllegalArgumentException(new IllegalArgumentException(testMessage))
@@ -396,20 +340,16 @@ class ExceptionControllerTest {
 
     @Test
     void errorResponse_ShouldBeImmutable() {
-        // Test that ErrorResponse fields are immutable (final)
         ExceptionController.ErrorResponse errorResponse = new ExceptionController.ErrorResponse("Error", "Message");
 
-        // The fields should be final and not changeable
         LocalDateTime originalTimestamp = errorResponse.getTimestamp();
 
-        // Wait a bit to ensure time has passed
         try {
             Thread.sleep(10);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
-        // Timestamp should remain the same (immutable)
         assertThat(errorResponse.getTimestamp()).isEqualTo(originalTimestamp);
     }
 }
