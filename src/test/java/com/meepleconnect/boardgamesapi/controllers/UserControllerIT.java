@@ -1,5 +1,6 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meepleconnect.boardgamesapi.dtos.UserRequestDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -90,7 +92,8 @@ public class UserControllerIT {
 
     @Test
     void registerUser_WithValidUser_ShouldReturnCreatedUser() throws Exception {
-        UserRequestDTO newUser = createTestUser("testuser", "password123");
+        String uniqueUsername = "testuser_" + System.currentTimeMillis();
+        UserRequestDTO newUser = createTestUser(uniqueUsername, "password123");
         String userJson = objectMapper.writeValueAsString(newUser);
 
         mockMvc.perform(post("/api/users/register")
@@ -99,7 +102,7 @@ public class UserControllerIT {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.userName").value("testuser"))
+                .andExpect(jsonPath("$.userName").value(uniqueUsername))
                 .andExpect(jsonPath("$.roles").exists())
                 .andExpect(header().string("Location", containsString("/api/users/")));
     }
@@ -130,7 +133,8 @@ public class UserControllerIT {
 
     @Test
     void registerUser_WithEmptyPassword_ShouldReturnBadRequest() throws Exception {
-        UserRequestDTO newUser = createTestUser("testuser", "");
+        String uniqueUsername = "emptypass_" + System.currentTimeMillis();
+        UserRequestDTO newUser = createTestUser(uniqueUsername, "");
         String userJson = objectMapper.writeValueAsString(newUser);
 
         mockMvc.perform(post("/api/users/register")
@@ -142,7 +146,7 @@ public class UserControllerIT {
     @Test
     void registerUser_WithNullPassword_ShouldReturnBadRequest() throws Exception {
         UserRequestDTO newUser = new UserRequestDTO();
-        newUser.setUsername("testuser");
+        newUser.setUsername("nullpass_" + System.currentTimeMillis());
         newUser.setRoles(new String[] { "USER" });
         String userJson = objectMapper.writeValueAsString(newUser);
 
@@ -164,15 +168,32 @@ public class UserControllerIT {
 
     @Test
     void updateUser_WithValidUser_ShouldReturnUpdatedUser() throws Exception {
+        // Eerst een user aanmaken
+        String uniqueUsername = "updateuser_" + System.currentTimeMillis();
+        UserRequestDTO newUser = createTestUser(uniqueUsername, "password123");
+        String newUserJson = objectMapper.writeValueAsString(newUser);
+
+        MvcResult result = mockMvc.perform(post("/api/users/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newUserJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        // ID ophalen uit de response
+        String responseContent = result.getResponse().getContentAsString();
+        JsonNode jsonNode = objectMapper.readTree(responseContent);
+        Long userId = jsonNode.get("id").asLong();
+
+        // Nu de user updaten
         UserRequestDTO updateUser = createTestUser("updateduser", "newpassword123");
         String userJson = objectMapper.writeValueAsString(updateUser);
 
-        mockMvc.perform(put("/api/users/1")
+        mockMvc.perform(put("/api/users/" + userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userJson))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").value(userId))
                 .andExpect(jsonPath("$.userName").value("updateduser"))
                 .andExpect(jsonPath("$.roles").exists());
     }
@@ -201,10 +222,27 @@ public class UserControllerIT {
 
     @Test
     void updateUser_WithEmptyUserName_ShouldReturnBadRequest() throws Exception {
+        // Eerst een user aanmaken
+        String uniqueUsername = "emptyupdate_" + System.currentTimeMillis();
+        UserRequestDTO newUser = createTestUser(uniqueUsername, "password123");
+        String newUserJson = objectMapper.writeValueAsString(newUser);
+
+        MvcResult result = mockMvc.perform(post("/api/users/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newUserJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        // ID ophalen uit de response
+        String responseContent = result.getResponse().getContentAsString();
+        JsonNode jsonNode = objectMapper.readTree(responseContent);
+        Long userId = jsonNode.get("id").asLong();
+
+        // Nu proberen te updaten met lege username
         UserRequestDTO updateUser = createTestUser("", "newpassword123");
         String userJson = objectMapper.writeValueAsString(updateUser);
 
-        mockMvc.perform(put("/api/users/1")
+        mockMvc.perform(put("/api/users/" + userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userJson))
                 .andExpect(status().isBadRequest());
@@ -212,12 +250,29 @@ public class UserControllerIT {
 
     @Test
     void updateUser_WithNullUserName_ShouldReturnBadRequest() throws Exception {
+        // Eerst een user aanmaken
+        String uniqueUsername = "nullupdate_" + System.currentTimeMillis();
+        UserRequestDTO newUser = createTestUser(uniqueUsername, "password123");
+        String newUserJson = objectMapper.writeValueAsString(newUser);
+
+        MvcResult result = mockMvc.perform(post("/api/users/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newUserJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        // ID ophalen uit de response
+        String responseContent = result.getResponse().getContentAsString();
+        JsonNode jsonNode = objectMapper.readTree(responseContent);
+        Long userId = jsonNode.get("id").asLong();
+
+        // Nu proberen te updaten met null username
         UserRequestDTO updateUser = new UserRequestDTO();
         updateUser.setPassword("newpassword123");
         updateUser.setRoles(new String[] { "USER" });
         String userJson = objectMapper.writeValueAsString(updateUser);
 
-        mockMvc.perform(put("/api/users/1")
+        mockMvc.perform(put("/api/users/" + userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userJson))
                 .andExpect(status().isBadRequest());
@@ -225,9 +280,26 @@ public class UserControllerIT {
 
     @Test
     void updateUser_WithInvalidJson_ShouldReturnServerError() throws Exception {
+        // Eerst een user aanmaken
+        String uniqueUsername = "invalidjson_" + System.currentTimeMillis();
+        UserRequestDTO newUser = createTestUser(uniqueUsername, "password123");
+        String newUserJson = objectMapper.writeValueAsString(newUser);
+
+        MvcResult result = mockMvc.perform(post("/api/users/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newUserJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        // ID ophalen uit de response
+        String responseContent = result.getResponse().getContentAsString();
+        JsonNode jsonNode = objectMapper.readTree(responseContent);
+        Long userId = jsonNode.get("id").asLong();
+
+        // Nu proberen te updaten met invalid JSON
         String invalidJson = "{ invalid json }";
 
-        mockMvc.perform(put("/api/users/1")
+        mockMvc.perform(put("/api/users/" + userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidJson))
                 .andExpect(status().isInternalServerError());
@@ -235,7 +307,24 @@ public class UserControllerIT {
 
     @Test
     void deleteUser_WithValidId_ShouldReturnNoContent() throws Exception {
-        mockMvc.perform(delete("/api/users/1"))
+        // Eerst een user aanmaken
+        String uniqueUsername = "deleteuser_" + System.currentTimeMillis();
+        UserRequestDTO newUser = createTestUser(uniqueUsername, "password123");
+        String newUserJson = objectMapper.writeValueAsString(newUser);
+
+        MvcResult result = mockMvc.perform(post("/api/users/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newUserJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        // ID ophalen uit de response
+        String responseContent = result.getResponse().getContentAsString();
+        JsonNode jsonNode = objectMapper.readTree(responseContent);
+        Long userId = jsonNode.get("id").asLong();
+
+        // Nu de user verwijderen
+        mockMvc.perform(delete("/api/users/" + userId))
                 .andExpect(status().isNoContent());
     }
 

@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureWebMvc
 @ActiveProfiles("test")
 @Transactional
-class BoardgameControllerIT {
+public class BoardgameControllerIT {
 
     @Autowired
     private WebApplicationContext webApplicationContext;

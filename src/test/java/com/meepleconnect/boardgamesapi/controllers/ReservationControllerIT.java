@@ -55,16 +55,20 @@ public class ReservationControllerIT {
 
     private void createTestData() {
         if (userRepository.findByUserName("testuser").isPresent() &&
-                boardgameRepository.findByNameIgnoreCase("Test Boardgame").isPresent()) {
+                boardgameRepository.findByNameIgnoreCase("Test Boardgame").isPresent() &&
+                publisherRepository.findByName("Test Publisher") != null) {
             return;
         }
 
-        Publisher publisher = new Publisher();
-        publisher.setName("Test Publisher");
-        publisher.setCountryOfOrigin("Netherlands");
-        publisher.setFounded(2020);
-        publisher.setIndie(true);
-        publisher = publisherRepository.save(publisher);
+        Publisher publisher = publisherRepository.findByName("Test Publisher");
+        if (publisher == null) {
+            publisher = new Publisher();
+            publisher.setName("Test Publisher");
+            publisher.setCountryOfOrigin("Netherlands");
+            publisher.setFounded(2020);
+            publisher.setIndie(true);
+            publisher = publisherRepository.save(publisher);
+        }
 
         User user = new User();
         user.setUserName("testuser");

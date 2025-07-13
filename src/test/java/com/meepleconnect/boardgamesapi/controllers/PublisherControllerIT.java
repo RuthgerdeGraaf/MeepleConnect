@@ -45,7 +45,21 @@ public class PublisherControllerIT {
 
     @Test
     void getPublisherById_ShouldReturnPublisher() throws Exception {
-        mockMvc.perform(get("/api/publishers/1"))
+        Publisher newPublisher = new Publisher();
+        newPublisher.setName("Publisher to Get " + System.currentTimeMillis());
+        newPublisher.setCountryOfOrigin("Test Country");
+        newPublisher.setFounded(2020);
+        newPublisher.setIndie(true);
+
+        String location = mockMvc.perform(post("/api/publishers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(newPublisher)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getHeader("Location");
+
+        String publisherId = location.substring(location.lastIndexOf("/") + 1);
+
+        mockMvc.perform(get("/api/publishers/" + publisherId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").exists())
@@ -113,7 +127,21 @@ public class PublisherControllerIT {
 
     @Test
     void deletePublisher_ShouldReturnNoContent() throws Exception {
-        mockMvc.perform(delete("/api/publishers/1"))
+        Publisher newPublisher = new Publisher();
+        newPublisher.setName("Publisher to Delete " + System.currentTimeMillis());
+        newPublisher.setCountryOfOrigin("Test Country");
+        newPublisher.setFounded(2020);
+        newPublisher.setIndie(true);
+
+        String location = mockMvc.perform(post("/api/publishers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(newPublisher)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getHeader("Location");
+
+        String publisherId = location.substring(location.lastIndexOf("/") + 1);
+
+        mockMvc.perform(delete("/api/publishers/" + publisherId))
                 .andExpect(status().isNoContent());
     }
 }
