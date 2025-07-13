@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureWebMvc
 @ActiveProfiles("test")
-class HealthControllerIT {
+public class HealthControllerIT {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -57,4 +57,4 @@ class HealthControllerIT {
                 .andExpect(jsonPath("$.database").value("CONNECTED"))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
-} 
+}

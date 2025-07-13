@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureWebMvc
 @ActiveProfiles("test")
-class ReviewControllerIT {
+public class ReviewControllerIT {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -136,4 +136,4 @@ class ReviewControllerIT {
                 .andExpect(jsonPath("$.helpfulCount").value(13))
                 .andExpect(jsonPath("$.markedAt").exists());
     }
-} 
+}

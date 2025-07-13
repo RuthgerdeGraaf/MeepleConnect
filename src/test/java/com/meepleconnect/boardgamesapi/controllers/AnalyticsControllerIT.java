@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureWebMvc
 @ActiveProfiles("test")
 @Transactional
-class AnalyticsControllerIT {
+public class AnalyticsControllerIT {
 
     @Autowired
     private WebApplicationContext webApplicationContext;

@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureWebMvc
 @ActiveProfiles("test")
-class EasterEggControllerIT {
+public class EasterEggControllerIT {
 
     @Autowired
     private WebApplicationContext webApplicationContext;

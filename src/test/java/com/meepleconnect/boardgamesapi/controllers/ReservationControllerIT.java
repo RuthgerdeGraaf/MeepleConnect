@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureWebMvc
 @ActiveProfiles("test")
-class ReservationControllerIT {
+public class ReservationControllerIT {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -54,8 +54,8 @@ class ReservationControllerIT {
     }
 
     private void createTestData() {
-        if (userRepository.findByUserName("testuser").isPresent() && 
-            boardgameRepository.findByNameIgnoreCase("Test Boardgame").isPresent()) {
+        if (userRepository.findByUserName("testuser").isPresent() &&
+                boardgameRepository.findByNameIgnoreCase("Test Boardgame").isPresent()) {
             return;
         }
 
@@ -97,7 +97,7 @@ class ReservationControllerIT {
     @Test
     void getReservationsByCustomer_ShouldReturnList() throws Exception {
         User testUser = userRepository.findByUserName("testuser").orElseThrow();
-        
+
         mockMvc.perform(get("/api/reservations/customer/" + testUser.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -107,7 +107,7 @@ class ReservationControllerIT {
     @Test
     void getReservationsByBoardgame_ShouldReturnList() throws Exception {
         Boardgame testBoardgame = boardgameRepository.findByNameIgnoreCase("Test Boardgame").orElseThrow();
-        
+
         mockMvc.perform(get("/api/reservations/boardgame/" + testBoardgame.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

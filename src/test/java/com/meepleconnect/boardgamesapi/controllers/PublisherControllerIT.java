@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureWebMvc
 @ActiveProfiles("test")
-class PublisherControllerIT {
+public class PublisherControllerIT {
 
     @Autowired
     private WebApplicationContext webApplicationContext;

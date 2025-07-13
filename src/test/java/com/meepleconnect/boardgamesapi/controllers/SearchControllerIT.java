@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureWebMvc
 @ActiveProfiles("test")
-class SearchControllerIT {
+public class SearchControllerIT {
 
     @Autowired
     private WebApplicationContext webApplicationContext;

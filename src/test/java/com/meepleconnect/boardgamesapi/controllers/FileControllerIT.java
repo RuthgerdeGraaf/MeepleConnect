@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureWebMvc
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class FileControllerIT {
+public class FileControllerIT {
 
         @Autowired
         private WebApplicationContext webApplicationContext;
