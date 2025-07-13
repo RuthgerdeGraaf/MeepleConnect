@@ -7,6 +7,7 @@ import com.meepleconnect.boardgamesapi.controllers.ExceptionControllerIT;
 import com.meepleconnect.boardgamesapi.controllers.FileControllerIT;
 import com.meepleconnect.boardgamesapi.controllers.HealthControllerIT;
 import com.meepleconnect.boardgamesapi.controllers.JwtAuthenticationControllerIT;
+import com.meepleconnect.boardgamesapi.controllers.NotificationControllerIT;
 import com.meepleconnect.boardgamesapi.controllers.PublicControllerIT;
 import com.meepleconnect.boardgamesapi.controllers.PublisherControllerIT;
 import com.meepleconnect.boardgamesapi.controllers.ReservationControllerIT;
@@ -30,6 +31,7 @@ import org.junit.platform.suite.api.Suite;
         FileControllerIT.class,
         HealthControllerIT.class,
         JwtAuthenticationControllerIT.class,
+        NotificationControllerIT.class,
         PublicControllerIT.class,
         PublisherControllerIT.class,
         ReservationControllerIT.class,
