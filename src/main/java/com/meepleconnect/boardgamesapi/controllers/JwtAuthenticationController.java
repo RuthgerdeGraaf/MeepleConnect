@@ -1,5 +1,6 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
+import com.meepleconnect.boardgamesapi.exceptions.BadRequestException;
 import com.meepleconnect.boardgamesapi.security.JwtRequest;
 import com.meepleconnect.boardgamesapi.security.JwtResponse;
 import com.meepleconnect.boardgamesapi.security.JwtUtil;
@@ -29,6 +30,18 @@ public class JwtAuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
+        if (authenticationRequest == null) {
+            throw new BadRequestException("Request body cannot be null");
+        }
+
+        if (authenticationRequest.getUsername() == null || authenticationRequest.getUsername().trim().isEmpty()) {
+            throw new BadRequestException("Username cannot be null or empty");
+        }
+
+        if (authenticationRequest.getPassword() == null || authenticationRequest.getPassword().trim().isEmpty()) {
+            throw new BadRequestException("Password cannot be null or empty");
+        }
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),
                         authenticationRequest.getPassword()));

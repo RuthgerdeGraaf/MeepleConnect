@@ -20,6 +20,11 @@ public interface UserDTOMapper {
     @Mapping(target = "roles", source = "roles", qualifiedByName = "mapRoles")
     User mapToModel(UserRequestDTO userDTO);
 
+    @Mapping(target = "roles", source = "roles")
+    UserResponseDTO mapToResponseDTO(User user);
+
+    RoleResponseDTO mapToRoleResponseDTO(Role role);
+
     @Named("mapRoles")
     default List<Role> mapRoles(String[] roles) {
         if (roles == null || roles.length == 0) {
