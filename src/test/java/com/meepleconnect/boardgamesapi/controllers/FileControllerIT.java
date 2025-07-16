@@ -15,15 +15,20 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -53,6 +58,60 @@ public class FileControllerIT {
                         Files.createDirectories(uploadPath);
                 }
                 FileUtils.cleanDirectory(uploadPath.toFile());
+        }
+
+        @Test
+        void constructor_ShouldCreateUploadDirectoryIfNotExists() throws Exception {
+                if (Files.exists(uploadPath)) {
+                        FileUtils.deleteDirectory(uploadPath.toFile());
+                }
+
+                assertThat(Files.exists(uploadPath)).isFalse();
+
+                FileController fileController = new FileController();
+
+                assertThat(Files.exists(uploadPath)).isTrue();
+                assertThat(Files.isDirectory(uploadPath)).isTrue();
+        }
+
+        @Test
+        void constructor_IOExceptionScenario_ShouldThrowRuntimeException() throws Exception {
+                String invalidPathName = "a".repeat(300); // Path too long
+                Path invalidPath = Paths.get(invalidPathName);
+
+                try (MockedStatic<Paths> pathsMock = Mockito.mockStatic(Paths.class);
+                                MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
+
+                        pathsMock.when(() -> Paths.get("uploads")).thenReturn(invalidPath);
+                        filesMock.when(() -> Files.exists(invalidPath)).thenReturn(false);
+                        filesMock.when(() -> Files.createDirectories(invalidPath))
+                                        .thenThrow(new IOException("Path name too long"));
+
+                        assertThatThrownBy(() -> new FileController())
+                                        .isInstanceOf(RuntimeException.class)
+                                        .hasMessage("Could not create upload directory")
+                                        .hasCauseInstanceOf(IOException.class);
+                }
+        }
+
+        @Test
+        void uploadFile_IOExceptionDuringCopy_ShouldThrowFileUploadException() throws Exception {
+                MockMultipartFile file = new MockMultipartFile("file", "test.txt", MediaType.TEXT_PLAIN_VALUE,
+                                "Test content".getBytes());
+
+                try (MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
+                        filesMock.when(() -> Files.exists(Mockito.any(Path.class))).thenCallRealMethod();
+                        filesMock.when(() -> Files.createDirectories(Mockito.any(Path.class))).thenCallRealMethod();
+
+                        filesMock.when(() -> Files.copy(Mockito.any(java.io.InputStream.class),
+                                        Mockito.any(Path.class)))
+                                        .thenThrow(new IOException("Disk full"));
+
+                        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/files/upload").file(file))
+                                        .andExpect(status().isInternalServerError())
+                                        .andExpect(jsonPath("$.error").value("File Upload Error"))
+                                        .andExpect(jsonPath("$.message").value("Could not upload file: Disk full"));
+                }
         }
 
         @Test
@@ -141,6 +200,24 @@ public class FileControllerIT {
                 mockMvc.perform(get("/api/files/" + filename))
                                 .andExpect(status().isOk())
                                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM));
+        }
+
+        @Test
+        void downloadFile_FileExistsAsDirectoryNotReadable_ShouldReturnNotFound() throws Exception {
+                String filename = "directory-not-file.txt";
+                Path directoryPath = uploadPath.resolve(filename);
+
+                Files.createDirectory(directoryPath);
+
+                assertThat(Files.exists(directoryPath)).isTrue();
+                assertThat(Files.isDirectory(directoryPath)).isTrue();
+
+                mockMvc.perform(get("/api/files/" + filename))
+                                .andExpect(status().isNotFound())
+                                .andExpect(jsonPath("$.error").value("File Not Found"))
+                                .andExpect(jsonPath("$.message").value("File '" + filename + "' not found"));
+
+                Files.delete(directoryPath);
         }
 
         @AfterAll

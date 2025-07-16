@@ -10,6 +10,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.security.core.AuthenticationException;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -375,5 +377,49 @@ public class ExceptionControllerIT {
                 }
 
                 assertThat(errorResponse.getTimestamp()).isEqualTo(originalTimestamp);
+        }
+
+        @Test
+        void handleNullPointerException_ShouldReturnBadRequest() {
+                NullPointerException ex = new NullPointerException("Something was null");
+
+                ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController
+                                .handleNullPointerException(ex);
+
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+                assertThat(response.getBody()).isNotNull();
+                assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+                assertThat(response.getBody().getMessage()).isEqualTo("Invalid request data");
+                assertThat(response.getBody().getTimestamp()).isNotNull();
+        }
+
+        @Test
+        void handleHttpMediaTypeNotSupportedException_ShouldReturnUnsupportedMediaType() {
+                HttpMediaTypeNotSupportedException ex = new HttpMediaTypeNotSupportedException(
+                                "Unsupported media type");
+
+                ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController
+                                .handleHttpMediaTypeNotSupportedException(ex);
+
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+                assertThat(response.getBody()).isNotNull();
+                assertThat(response.getBody().getError()).isEqualTo("Unsupported Media Type");
+                assertThat(response.getBody().getMessage()).isEqualTo("Content type not supported");
+                assertThat(response.getBody().getTimestamp()).isNotNull();
+        }
+
+        @Test
+        void handleAuthenticationException_ShouldReturnUnauthorized() {
+                AuthenticationException ex = new AuthenticationException("Authentication failed") {
+                };
+
+                ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController
+                                .handleAuthenticationException(ex);
+
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+                assertThat(response.getBody()).isNotNull();
+                assertThat(response.getBody().getError()).isEqualTo("Unauthorized");
+                assertThat(response.getBody().getMessage()).isEqualTo("Invalid credentials");
+                assertThat(response.getBody().getTimestamp()).isNotNull();
         }
 }
