@@ -76,7 +76,7 @@ public class FileControllerIT {
 
         @Test
         void constructor_IOExceptionScenario_ShouldThrowRuntimeException() throws Exception {
-                String invalidPathName = "a".repeat(300); // Path too long
+                String invalidPathName = "a".repeat(300);
                 Path invalidPath = Paths.get(invalidPathName);
 
                 try (MockedStatic<Paths> pathsMock = Mockito.mockStatic(Paths.class);

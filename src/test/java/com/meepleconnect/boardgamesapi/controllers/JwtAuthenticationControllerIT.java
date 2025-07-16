@@ -1,6 +1,7 @@
 package com.meepleconnect.boardgamesapi.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.meepleconnect.boardgamesapi.exceptions.BadRequestException;
 import com.meepleconnect.boardgamesapi.security.JwtRequest;
 import com.meepleconnect.boardgamesapi.security.JwtResponse;
 import com.meepleconnect.boardgamesapi.security.JwtUtil;
@@ -25,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -114,7 +116,7 @@ public class JwtAuthenticationControllerIT {
         @Test
         @WithMockUser
         void login_WithNullUsername_ShouldReturnBadRequest() throws Exception {
-                // Arrnge
+        
                 JwtRequest request = new JwtRequest(null, "testpass");
 
                 mockMvc.perform(post("/api/auth/login")
@@ -142,6 +144,16 @@ public class JwtAuthenticationControllerIT {
                 mockMvc.perform(post("/api/auth/login")
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isUnsupportedMediaType());
+        }
+
+        @Test
+        void login_WithNullAuthenticationRequest_ShouldThrowBadRequestException() {
+                JwtAuthenticationController controller = new JwtAuthenticationController(
+                                authenticationManager, jwtUtil, userDetailsService);
+
+                assertThatThrownBy(() -> controller.createAuthenticationToken(null))
+                                .isInstanceOf(BadRequestException.class)
+                                .hasMessage("Request body cannot be null");
         }
 
         @TestConfiguration

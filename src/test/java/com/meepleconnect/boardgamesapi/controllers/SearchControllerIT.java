@@ -200,4 +200,147 @@ public class SearchControllerIT {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(0))));
     }
+
+    @Test
+    void searchBoardgames_WithLowMaxPrice_ShouldFilterOutExpensiveGames() throws Exception {
+        Map<String, Object> searchCriteria = new HashMap<>();
+        searchCriteria.put("maxPrice", 20.0);
+
+        mockMvc.perform(post("/api/search/boardgames")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(searchCriteria)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    void advancedSearch_WithLowMaxPrice_ShouldFilterOutExpensiveGames() throws Exception {
+        Map<String, Object> advancedCriteria = new HashMap<>();
+        advancedCriteria.put("maxPrice", 15.0);
+
+        mockMvc.perform(post("/api/search/boardgames/advanced")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(advancedCriteria)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    void advancedSearch_WithEmptyName_ShouldReturnAllResults() throws Exception {
+        Map<String, Object> advancedCriteria = new HashMap<>();
+        advancedCriteria.put("name", "   ");
+
+        mockMvc.perform(post("/api/search/boardgames/advanced")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(advancedCriteria)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(0))));
+    }
+
+    @Test
+    void advancedSearch_WithWhitespaceOnlyName_ShouldReturnAllResults() throws Exception {
+        Map<String, Object> advancedCriteria = new HashMap<>();
+        advancedCriteria.put("name", "\t\n  \r ");
+
+        mockMvc.perform(post("/api/search/boardgames/advanced")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(advancedCriteria)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(0))));
+    }
+
+    @Test
+    void searchBoardgames_WithAvailableFalse_ShouldReturnUnavailableGames() throws Exception {
+        Map<String, Object> searchCriteria = new HashMap<>();
+        searchCriteria.put("available", false);
+
+        mockMvc.perform(post("/api/search/boardgames")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(searchCriteria)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(0))));
+    }
+
+    @Test
+    void advancedSearch_WithAvailableFalse_ShouldReturnUnavailableGames() throws Exception {
+        Map<String, Object> advancedCriteria = new HashMap<>();
+        advancedCriteria.put("available", false);
+
+        mockMvc.perform(post("/api/search/boardgames/advanced")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(advancedCriteria)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(0))));
+    }
+
+    @Test
+    void searchBoardgames_WithHighMinPlayers_ShouldFilterOutAllGames() throws Exception {
+        Map<String, Object> searchCriteria = new HashMap<>();
+        searchCriteria.put("minPlayers", 5);
+
+        mockMvc.perform(post("/api/search/boardgames")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(searchCriteria)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    void advancedSearch_WithHighMinPlayers_ShouldFilterOutAllGames() throws Exception {
+        Map<String, Object> advancedCriteria = new HashMap<>();
+        advancedCriteria.put("minPlayers", 4);
+
+        mockMvc.perform(post("/api/search/boardgames/advanced")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(advancedCriteria)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    void searchBoardgames_WithLowMaxPlayers_ShouldFilterOutAllGames() throws Exception {
+        Map<String, Object> searchCriteria = new HashMap<>();
+        searchCriteria.put("maxPlayers", 1);
+
+        mockMvc.perform(post("/api/search/boardgames")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(searchCriteria)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    void advancedSearch_WithLowMaxPlayers_ShouldFilterOutAllGames() throws Exception {
+        Map<String, Object> advancedCriteria = new HashMap<>();
+        advancedCriteria.put("maxPlayers", 1);
+
+        mockMvc.perform(post("/api/search/boardgames/advanced")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(advancedCriteria)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    void advancedSearch_WithHighMinPrice_ShouldFilterOutAllGames() throws Exception {
+        Map<String, Object> advancedCriteria = new HashMap<>();
+        advancedCriteria.put("minPrice", 100.0);
+
+        mockMvc.perform(post("/api/search/boardgames/advanced")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(advancedCriteria)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
 }

@@ -3,6 +3,7 @@ package com.meepleconnect.boardgamesapi.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meepleconnect.boardgamesapi.dtos.ReservationRequestDTO;
 import com.meepleconnect.boardgamesapi.entities.User;
+import com.meepleconnect.boardgamesapi.exceptions.BadRequestException;
 import com.meepleconnect.boardgamesapi.models.Boardgame;
 import com.meepleconnect.boardgamesapi.models.Publisher;
 import com.meepleconnect.boardgamesapi.repositories.BoardgameRepository;
@@ -21,6 +22,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -162,5 +164,62 @@ public class ReservationControllerIT {
 
         mockMvc.perform(delete("/api/reservations/" + reservationId))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void createReservation_WithZeroParticipants_ShouldReturnBadRequest() throws Exception {
+        User testUser = userRepository.findByUserName("testuser").orElseThrow();
+        Boardgame testBoardgame = boardgameRepository.findByNameIgnoreCase("Test Boardgame").orElseThrow();
+
+        ReservationRequestDTO dto = new ReservationRequestDTO();
+        dto.setCustomerId(testUser.getId());
+        dto.setBoardgameId(testBoardgame.getId());
+        dto.setReservationDate(LocalDate.now().plusDays(2));
+        dto.setParticipantCount(0);
+        dto.setNotes("Invalid reservering");
+
+        mockMvc.perform(post("/api/reservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("participantCount: Number of participants must be at least 1"));
+    }
+
+    @Test
+    void createReservation_WithNegativeParticipants_ShouldReturnBadRequest() throws Exception {
+        User testUser = userRepository.findByUserName("testuser").orElseThrow();
+        Boardgame testBoardgame = boardgameRepository.findByNameIgnoreCase("Test Boardgame").orElseThrow();
+
+        ReservationRequestDTO dto = new ReservationRequestDTO();
+        dto.setCustomerId(testUser.getId());
+        dto.setBoardgameId(testBoardgame.getId());
+        dto.setReservationDate(LocalDate.now().plusDays(2));
+        dto.setParticipantCount(-5);
+        dto.setNotes("Invalid reservering");
+
+        mockMvc.perform(post("/api/reservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("participantCount: Number of participants must be at least 1"));
+    }
+
+    @Test
+    void createReservation_DirectCall_WithZeroParticipants_ShouldThrowBadRequestException() throws Exception {
+
+        ReservationController controller = webApplicationContext.getBean(ReservationController.class);
+
+        ReservationRequestDTO dto = new ReservationRequestDTO();
+        dto.setCustomerId(1L);
+        dto.setBoardgameId(1L);
+        dto.setReservationDate(LocalDate.now().plusDays(2));
+        dto.setParticipantCount(0);
+        dto.setNotes("Direct call test");
+
+        assertThatThrownBy(() -> controller.createReservation(dto))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Number of participants must be greater than 0.");
     }
 }

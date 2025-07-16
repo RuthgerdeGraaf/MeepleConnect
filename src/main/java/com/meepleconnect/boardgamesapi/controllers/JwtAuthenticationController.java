@@ -30,7 +30,6 @@ public class JwtAuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
-        // Input validation
         if (authenticationRequest == null) {
             throw new BadRequestException("Request body cannot be null");
         }

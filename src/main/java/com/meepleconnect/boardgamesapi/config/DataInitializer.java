@@ -53,10 +53,8 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initializeDefaultData() {
-        // Verwijder alle bestaande users om dubbele of oude referenties te voorkomen
         userRepository.deleteAll();
 
-        // Maak rollen aan of haal ze op als ze al bestaan
         Role adminRole = roleRepository.findAll().stream()
                 .filter(r -> "ROLE_ADMIN".equals(r.getRoleName()))
                 .findFirst()
@@ -78,11 +76,9 @@ public class DataInitializer implements CommandLineRunner {
                     return roleRepository.save(role);
                 });
 
-        // Haal altijd verse, managed instanties op uit de repository
         adminRole = roleRepository.findById(adminRole.getId()).orElseThrow();
         userRole = roleRepository.findById(userRole.getId()).orElseThrow();
 
-        // Koppel alleen verse instanties aan de gebruiker
         User ruthger = new User();
         ruthger.setUserName("Ruthger");
         ruthger.setPassword(passwordEncoder.encode("password123"));

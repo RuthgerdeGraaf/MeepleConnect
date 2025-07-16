@@ -218,7 +218,7 @@ public class AnalyticsControllerIT {
         mockMvc.perform(get("/api/analytics/customer/insights"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.customerInsights.totalCustomers").value(3))
-                .andExpect(jsonPath("$.customerInsights.activeCustomers").value(2.25)); // 75% of 3
+                .andExpect(jsonPath("$.customerInsights.activeCustomers").value(2.25));
     }
 
     @Test

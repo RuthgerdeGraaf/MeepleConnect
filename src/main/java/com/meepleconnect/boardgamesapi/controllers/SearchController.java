@@ -33,7 +33,6 @@ public class SearchController {
 
         List<Boardgame> boardgames = boardgameService.getFilteredBoardgames(genre, available, minPlayers, maxPlayers);
 
-                // Filter op prijs als opgegeven
         if (maxPrice != null) {
             boardgames = boardgames.stream()
                 .filter(game -> game.getPrice().doubleValue() <= maxPrice)
@@ -56,7 +55,6 @@ public class SearchController {
 
         List<Boardgame> boardgames = boardgameService.getAllBoardgames();
 
-        // Pas filters toe
         if (name != null && !name.trim().isEmpty()) {
             boardgames = boardgames.stream()
                     .filter(game -> game.getName().toLowerCase().contains(name.toLowerCase()))
