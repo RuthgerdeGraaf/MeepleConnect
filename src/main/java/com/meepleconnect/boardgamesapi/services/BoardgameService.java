@@ -125,7 +125,6 @@ public class BoardgameService {
         Map<String, Object> popularGames = new HashMap<>();
         List<Boardgame> allGames = boardgameRepository.findAll();
 
-        // Simuleer populariteit op basis van beschikbaarheid en prijs
         List<Map<String, Object>> games = allGames.stream()
                 .limit(5)
                 .map(game -> {
