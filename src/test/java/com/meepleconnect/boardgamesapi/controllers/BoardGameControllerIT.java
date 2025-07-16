@@ -377,7 +377,7 @@ public class BoardgameControllerIT {
     @Test
     void addBoardgame_WithDuplicateName_ShouldReturnConflict() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
-        requestDTO.setName("Test Game"); // Same name as existing boardgame
+        requestDTO.setName("Test Game");
         requestDTO.setPrice(new BigDecimal("45.99"));
         requestDTO.setAvailable(true);
         requestDTO.setMinPlayers(2);
@@ -445,7 +445,7 @@ public class BoardgameControllerIT {
     @Test
     void updateBoardgame_WithInvalidData_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
-        requestDTO.setName(""); // Invalid empty name
+        requestDTO.setName("");
         requestDTO.setPrice(new BigDecimal("59.99"));
         requestDTO.setAvailable(false);
         requestDTO.setMinPlayers(3);
