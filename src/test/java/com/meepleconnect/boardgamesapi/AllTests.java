@@ -16,9 +16,10 @@ import com.meepleconnect.boardgamesapi.controllers.SearchControllerIT;
 import com.meepleconnect.boardgamesapi.controllers.SecureControllerIT;
 import com.meepleconnect.boardgamesapi.controllers.StatisticsControllerIT;
 import com.meepleconnect.boardgamesapi.controllers.UserControllerIT;
-//import com.meepleconnect.boardgamesapi.services.BoardgameServiceTest;
-//import com.meepleconnect.boardgamesapi.services.ReservationServiceTest;
-//import com.meepleconnect.boardgamesapi.services.UserServiceTest;
+import com.meepleconnect.boardgamesapi.services.BoardgameServiceTest;
+import com.meepleconnect.boardgamesapi.services.PublisherServiceTest;
+import com.meepleconnect.boardgamesapi.services.ReservationServiceTest;
+import com.meepleconnect.boardgamesapi.services.UserServiceTest;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
 
@@ -39,10 +40,11 @@ import org.junit.platform.suite.api.Suite;
         SearchControllerIT.class,
         SecureControllerIT.class,
         StatisticsControllerIT.class,
-        UserControllerIT.class
-//// BoardgameServiceTest.class,
-//// ReservationServiceTest.class,
-//// UserServiceTest.class
+        UserControllerIT.class,
+        BoardgameServiceTest.class,
+        PublisherServiceTest.class,
+        ReservationServiceTest.class,
+        UserServiceTest.class
 })
 public class AllTests {
     // Deze klasse dient alleen als container voor de test suite
