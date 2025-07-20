@@ -6,6 +6,7 @@ import com.meepleconnect.boardgamesapi.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,7 +41,8 @@ public class UserService {
         if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
             existingUser.setPassword(passwordEncoder.encode(userDetails.getPassword()));
         }
-        existingUser.setRoles(userDetails.getRoles());
+
+        existingUser.setRoles(new ArrayList<>(userDetails.getRoles()));
 
         return userRepository.save(existingUser);
     }

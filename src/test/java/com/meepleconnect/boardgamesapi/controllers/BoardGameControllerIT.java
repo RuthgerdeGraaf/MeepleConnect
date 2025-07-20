@@ -231,6 +231,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithValidData_ShouldCreateBoardgame() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("New Game");
@@ -260,6 +261,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithEmptyName_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("");
@@ -277,6 +279,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithNullName_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName(null);
@@ -294,6 +297,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithInvalidPrice_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("New Game");
@@ -311,6 +315,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithInvalidMinPlayers_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("New Game");
@@ -328,6 +333,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithInvalidMaxPlayers_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("New Game");
@@ -345,6 +351,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithInvalidGenre_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("New Game");
@@ -362,6 +369,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithInvalidPublisherId_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("New Game");
@@ -379,6 +387,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithDuplicateName_ShouldReturnConflict() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("Test Game");
@@ -398,6 +407,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void updateBoardgame_WithValidData_ShouldUpdateBoardgame() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("Updated Game");
@@ -428,6 +438,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void updateBoardgame_WithInvalidId_ShouldReturnNotFound() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("Updated Game");
@@ -447,6 +458,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void updateBoardgame_WithInvalidData_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("");
@@ -464,6 +476,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deleteBoardgame_WithValidId_ShouldDeleteBoardgame() throws Exception {
         mockMvc.perform(delete("/api/boardgames/{id}", testBoardgame.getId()))
                 .andExpect(status().isNoContent());
@@ -472,6 +485,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deleteBoardgame_WithInvalidId_ShouldReturnNotFound() throws Exception {
         mockMvc.perform(delete("/api/boardgames/{id}", 999L))
                 .andExpect(status().isNotFound())

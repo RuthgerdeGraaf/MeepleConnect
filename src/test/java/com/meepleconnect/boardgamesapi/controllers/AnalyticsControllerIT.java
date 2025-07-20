@@ -6,6 +6,7 @@ import com.meepleconnect.boardgamesapi.models.Boardgame;
 import com.meepleconnect.boardgamesapi.models.Publisher;
 import com.meepleconnect.boardgamesapi.repositories.BoardgameRepository;
 import com.meepleconnect.boardgamesapi.repositories.PublisherRepository;
+import com.meepleconnect.boardgamesapi.repositories.RoleRepository;
 import com.meepleconnect.boardgamesapi.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import java.util.Arrays;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 @SpringBootTest
 @AutoConfigureWebMvc
@@ -45,13 +47,19 @@ public class AnalyticsControllerIT {
     @Autowired
     private PublisherRepository publisherRepository;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
     private MockMvc mockMvc;
     private Publisher testPublisher;
     private User testUser;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .build();
 
         testPublisher = new Publisher();
         testPublisher.setName("Test Publisher");
@@ -64,6 +72,7 @@ public class AnalyticsControllerIT {
         userRole.setRoleName("ROLE_USER");
         userRole.setActive(true);
         userRole.setDescription("user roles");
+        userRole = roleRepository.save(userRole);
 
         testUser = new User();
         testUser.setUserName("testuser");
@@ -194,6 +203,7 @@ public class AnalyticsControllerIT {
         userRole.setRoleName("ROLE_USER");
         userRole.setActive(true);
         userRole.setDescription("user roles");
+        userRole = roleRepository.save(userRole);
 
         User user2 = new User();
         user2.setUserName("user2");
