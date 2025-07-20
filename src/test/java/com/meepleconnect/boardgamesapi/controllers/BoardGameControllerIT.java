@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -49,8 +50,11 @@ public class BoardgameControllerIT {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .apply(org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity())
+                .build();
+
         testPublisher = new Publisher();
         testPublisher.setName("Test Publisher");
         testPublisher.setCountryOfOrigin("Netherlands");
@@ -111,7 +115,7 @@ public class BoardgameControllerIT {
         boardgameRepository.save(familyGame);
 
         mockMvc.perform(get("/api/boardgames")
-                        .param("genre", "Strategy"))
+                .param("genre", "Strategy"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").value(org.hamcrest.Matchers.hasSize(1)))
@@ -131,7 +135,7 @@ public class BoardgameControllerIT {
         boardgameRepository.save(unavailableGame);
 
         mockMvc.perform(get("/api/boardgames")
-                        .param("available", "true"))
+                .param("available", "true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").value(org.hamcrest.Matchers.hasSize(1)))
@@ -151,7 +155,7 @@ public class BoardgameControllerIT {
         boardgameRepository.save(highPlayerGame);
 
         mockMvc.perform(get("/api/boardgames")
-                        .param("minPlayers", "3"))
+                .param("minPlayers", "3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").value(org.hamcrest.Matchers.hasSize(1)))
@@ -171,7 +175,7 @@ public class BoardgameControllerIT {
         boardgameRepository.save(lowPlayerGame);
 
         mockMvc.perform(get("/api/boardgames")
-                        .param("maxPlayers", "3"))
+                .param("maxPlayers", "3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").value(org.hamcrest.Matchers.hasSize(1)))
@@ -191,10 +195,10 @@ public class BoardgameControllerIT {
         boardgameRepository.save(filteredGame);
 
         mockMvc.perform(get("/api/boardgames")
-                        .param("genre", "Strategy")
-                        .param("available", "true")
-                        .param("minPlayers", "2")
-                        .param("maxPlayers", "6"))
+                .param("genre", "Strategy")
+                .param("available", "true")
+                .param("minPlayers", "2")
+                .param("maxPlayers", "6"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").value(org.hamcrest.Matchers.hasSize(2)))
@@ -227,6 +231,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithValidData_ShouldCreateBoardgame() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("New Game");
@@ -238,8 +243,8 @@ public class BoardgameControllerIT {
         requestDTO.setPublisherId(testPublisher.getId());
 
         mockMvc.perform(post("/api/boardgames")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/boardgames/" + (testBoardgame.getId() + 1)))
                 .andExpect(jsonPath("$.name").value("New Game"))
@@ -256,6 +261,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithEmptyName_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("");
@@ -267,12 +273,13 @@ public class BoardgameControllerIT {
         requestDTO.setPublisherId(testPublisher.getId());
 
         mockMvc.perform(post("/api/boardgames")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithNullName_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName(null);
@@ -284,12 +291,13 @@ public class BoardgameControllerIT {
         requestDTO.setPublisherId(testPublisher.getId());
 
         mockMvc.perform(post("/api/boardgames")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithInvalidPrice_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("New Game");
@@ -301,12 +309,13 @@ public class BoardgameControllerIT {
         requestDTO.setPublisherId(testPublisher.getId());
 
         mockMvc.perform(post("/api/boardgames")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithInvalidMinPlayers_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("New Game");
@@ -318,12 +327,13 @@ public class BoardgameControllerIT {
         requestDTO.setPublisherId(testPublisher.getId());
 
         mockMvc.perform(post("/api/boardgames")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithInvalidMaxPlayers_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("New Game");
@@ -335,12 +345,13 @@ public class BoardgameControllerIT {
         requestDTO.setPublisherId(testPublisher.getId());
 
         mockMvc.perform(post("/api/boardgames")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithInvalidGenre_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("New Game");
@@ -352,12 +363,13 @@ public class BoardgameControllerIT {
         requestDTO.setPublisherId(testPublisher.getId());
 
         mockMvc.perform(post("/api/boardgames")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithInvalidPublisherId_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("New Game");
@@ -369,12 +381,13 @@ public class BoardgameControllerIT {
         requestDTO.setPublisherId(999L);
 
         mockMvc.perform(post("/api/boardgames")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addBoardgame_WithDuplicateName_ShouldReturnConflict() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("Test Game");
@@ -386,14 +399,15 @@ public class BoardgameControllerIT {
         requestDTO.setPublisherId(testPublisher.getId());
 
         mockMvc.perform(post("/api/boardgames")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.error").value("Conflict"))
                 .andExpect(jsonPath("$.message").value("Boardagme with name 'Test Game' already exists."));
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void updateBoardgame_WithValidData_ShouldUpdateBoardgame() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("Updated Game");
@@ -405,8 +419,8 @@ public class BoardgameControllerIT {
         requestDTO.setPublisherId(testPublisher.getId());
 
         mockMvc.perform(put("/api/boardgames/{id}", testBoardgame.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(testBoardgame.getId()))
                 .andExpect(jsonPath("$.name").value("Updated Game"))
@@ -424,6 +438,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void updateBoardgame_WithInvalidId_ShouldReturnNotFound() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("Updated Game");
@@ -435,14 +450,15 @@ public class BoardgameControllerIT {
         requestDTO.setPublisherId(testPublisher.getId());
 
         mockMvc.perform(put("/api/boardgames/{id}", 999L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Game Not Found"))
                 .andExpect(jsonPath("$.message").value("Boardgame with ID 999 not found."));
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void updateBoardgame_WithInvalidData_ShouldReturnBadRequest() throws Exception {
         BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
         requestDTO.setName("");
@@ -454,12 +470,13 @@ public class BoardgameControllerIT {
         requestDTO.setPublisherId(testPublisher.getId());
 
         mockMvc.perform(put("/api/boardgames/{id}", testBoardgame.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deleteBoardgame_WithValidId_ShouldDeleteBoardgame() throws Exception {
         mockMvc.perform(delete("/api/boardgames/{id}", testBoardgame.getId()))
                 .andExpect(status().isNoContent());
@@ -468,6 +485,7 @@ public class BoardgameControllerIT {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deleteBoardgame_WithInvalidId_ShouldReturnNotFound() throws Exception {
         mockMvc.perform(delete("/api/boardgames/{id}", 999L))
                 .andExpect(status().isNotFound())
@@ -487,9 +505,137 @@ public class BoardgameControllerIT {
     @Test
     void getAllBoardgames_WithNonMatchingFilters_ShouldReturnEmptyList() throws Exception {
         mockMvc.perform(get("/api/boardgames")
-                        .param("genre", "NonExistentGenre"))
+                .param("genre", "NonExistentGenre"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").value(org.hamcrest.Matchers.hasSize(0)));
     }
-} 
+
+    @Test
+    void addBoardgame_WithoutAuthentication_ShouldReturnForbidden() throws Exception {
+        BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
+        requestDTO.setName("Security Test Game");
+        requestDTO.setPrice(new BigDecimal("29.99"));
+        requestDTO.setAvailable(true);
+        requestDTO.setMinPlayers(2);
+        requestDTO.setMaxPlayers(4);
+        requestDTO.setGenre("Strategy");
+        requestDTO.setPublisherId(testPublisher.getId());
+
+        mockMvc.perform(post("/api/boardgames")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void addBoardgame_WithUserRole_ShouldReturnForbidden() throws Exception {
+        BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
+        requestDTO.setName("Security Test Game");
+        requestDTO.setPrice(new BigDecimal("29.99"));
+        requestDTO.setAvailable(true);
+        requestDTO.setMinPlayers(2);
+        requestDTO.setMaxPlayers(4);
+        requestDTO.setGenre("Strategy");
+        requestDTO.setPublisherId(testPublisher.getId());
+
+        mockMvc.perform(post("/api/boardgames")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void addBoardgame_WithAdminRole_ShouldCreateBoardgame() throws Exception {
+        BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
+        requestDTO.setName("Admin Test Game");
+        requestDTO.setPrice(new BigDecimal("29.99"));
+        requestDTO.setAvailable(true);
+        requestDTO.setMinPlayers(2);
+        requestDTO.setMaxPlayers(4);
+        requestDTO.setGenre("Strategy");
+        requestDTO.setPublisherId(testPublisher.getId());
+
+        mockMvc.perform(post("/api/boardgames")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Admin Test Game"));
+    }
+
+    @Test
+    void updateBoardgame_WithoutAuthentication_ShouldReturnForbidden() throws Exception {
+        BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
+        requestDTO.setName("Updated Security Game");
+        requestDTO.setPrice(new BigDecimal("39.99"));
+        requestDTO.setAvailable(false);
+        requestDTO.setMinPlayers(3);
+        requestDTO.setMaxPlayers(6);
+        requestDTO.setGenre("Adventure");
+        requestDTO.setPublisherId(testPublisher.getId());
+
+        mockMvc.perform(put("/api/boardgames/{id}", testBoardgame.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void updateBoardgame_WithUserRole_ShouldReturnForbidden() throws Exception {
+        BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
+        requestDTO.setName("Updated Security Game");
+        requestDTO.setPrice(new BigDecimal("39.99"));
+        requestDTO.setAvailable(false);
+        requestDTO.setMinPlayers(3);
+        requestDTO.setMaxPlayers(6);
+        requestDTO.setGenre("Adventure");
+        requestDTO.setPublisherId(testPublisher.getId());
+
+        mockMvc.perform(put("/api/boardgames/{id}", testBoardgame.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void updateBoardgame_WithAdminRole_ShouldUpdateBoardgame() throws Exception {
+        BoardgameRequestDTO requestDTO = new BoardgameRequestDTO();
+        requestDTO.setName("Admin Updated Game");
+        requestDTO.setPrice(new BigDecimal("39.99"));
+        requestDTO.setAvailable(false);
+        requestDTO.setMinPlayers(3);
+        requestDTO.setMaxPlayers(6);
+        requestDTO.setGenre("Adventure");
+        requestDTO.setPublisherId(testPublisher.getId());
+
+        mockMvc.perform(put("/api/boardgames/{id}", testBoardgame.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Admin Updated Game"));
+    }
+
+    @Test
+    void deleteBoardgame_WithoutAuthentication_ShouldReturnForbidden() throws Exception {
+        mockMvc.perform(delete("/api/boardgames/{id}", testBoardgame.getId()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void deleteBoardgame_WithUserRole_ShouldReturnForbidden() throws Exception {
+        mockMvc.perform(delete("/api/boardgames/{id}", testBoardgame.getId()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deleteBoardgame_WithAdminRole_ShouldDeleteBoardgame() throws Exception {
+        mockMvc.perform(delete("/api/boardgames/{id}", testBoardgame.getId()))
+                .andExpect(status().isNoContent());
+    }
+}

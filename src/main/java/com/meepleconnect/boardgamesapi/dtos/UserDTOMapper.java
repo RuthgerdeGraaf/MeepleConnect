@@ -2,58 +2,63 @@ package com.meepleconnect.boardgamesapi.dtos;
 
 import com.meepleconnect.boardgamesapi.entities.User;
 import com.meepleconnect.boardgamesapi.entities.Role;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
+import com.meepleconnect.boardgamesapi.services.RoleService;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-@Mapper(componentModel = "spring")
-public interface UserDTOMapper {
+@Component
+public class UserDTOMapper {
 
-    UserDTOMapper INSTANCE = Mappers.getMapper(UserDTOMapper.class);
+    private final RoleService roleService;
 
-    @Mapping(target = "userName", source = "username")
-    @Mapping(target = "password", source = "password")
-    @Mapping(target = "roles", source = "roles", qualifiedByName = "mapRoles")
-    User mapToModel(UserRequestDTO userDTO);
+    public UserDTOMapper(RoleService roleService) {
+        this.roleService = roleService;
+    }
 
-    @Mapping(target = "roles", source = "roles")
-    UserResponseDTO mapToResponseDTO(User user);
+    public User mapToModel(UserRequestDTO userDTO) {
+        User user = new User();
+        user.setUserName(userDTO.getUsername());
+        user.setPassword(userDTO.getPassword());
+        user.setRoles(mapRoles(userDTO.getRoles()));
+        return user;
+    }
 
-    RoleResponseDTO mapToRoleResponseDTO(Role role);
+    public UserResponseDTO mapToResponseDTO(User user) {
+        UserResponseDTO dto = new UserResponseDTO();
+        dto.setId(user.getId());
+        dto.setUserName(user.getUserName());
+        dto.setRoles(user.getRoles().stream()
+                .map(this::mapToRoleResponseDTO)
+                .toList());
+        return dto;
+    }
 
-    @Named("mapRoles")
-    default List<Role> mapRoles(String[] roles) {
+    public RoleResponseDTO mapToRoleResponseDTO(Role role) {
+        RoleResponseDTO dto = new RoleResponseDTO();
+        dto.setId(role.getId());
+        dto.setRoleName(role.getRoleName());
+        dto.setActive(role.isActive());
+        dto.setDescription(role.getDescription());
+        return dto;
+    }
+
+    private List<Role> mapRoles(String[] roles) {
         if (roles == null || roles.length == 0) {
-            Role role = new Role();
-            role.setRoleName("USER");
-            role.setActive(true);
-            role.setDescription("Default user role");
-            List<Role> roleList = new ArrayList<>();
-            roleList.add(role);
-            return roleList;
+            return Arrays.asList(roleService.findDefaultUserRole());
         }
 
         try {
-            String roleName = roles[0].toUpperCase();
-            Role role = new Role();
-            role.setRoleName(roleName);
-            role.setActive(true);
-            role.setDescription("User role");
-            List<Role> roleList = new ArrayList<>();
-            roleList.add(role);
-            return roleList;
-        } catch (IllegalArgumentException e) {
-            Role role = new Role();
-            role.setRoleName("USER");
-            role.setActive(true);
-            role.setDescription("Default user role");
-            List<Role> roleList = new ArrayList<>();
-            roleList.add(role);
-            return roleList;
+            String roleName = "ROLE_" + roles[0].toUpperCase();
+            List<Role> foundRoles = roleService.findRolesByNames(roleName);
+            if (!foundRoles.isEmpty()) {
+                return Arrays.asList(foundRoles.get(0));
+            }
+            return Arrays.asList(roleService.findDefaultUserRole());
+        } catch (Exception e) {
+            return Arrays.asList(roleService.findDefaultUserRole());
         }
     }
 }

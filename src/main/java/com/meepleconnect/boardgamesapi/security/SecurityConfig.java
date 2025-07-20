@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -34,17 +35,44 @@ public class SecurityConfig {
                         .requestMatchers("/public/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
+                        .requestMatchers("/api/health/**").permitAll()
+                        .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/api/boardgames/**").permitAll()
-                        .requestMatchers("/api/publishers/**").permitAll()
-                        .requestMatchers("/api/reservations/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/boardgames/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/publishers/**").permitAll()
                         .requestMatchers("/api/files/download/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/notifications/**").permitAll()
+                        .requestMatchers("/api/fun/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/analytics/**").permitAll()
+
                         .requestMatchers("/secure/admin").hasRole("ADMIN")
                         .requestMatchers("/secure/user").hasRole("USER")
                         .requestMatchers("/secure/**").authenticated()
                         .requestMatchers("/api/files/upload").hasRole("EMPLOYEE")
-                        .anyRequest().authenticated())
+
+                        .requestMatchers(HttpMethod.POST, "/api/boardgames/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/boardgames/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/boardgames/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/publishers/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/publishers/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/publishers/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/**").authenticated()
+                        .requestMatchers("/api/reservations/**").authenticated()
+                        .requestMatchers("/api/statistics/**").authenticated()
+
+                        .anyRequest().permitAll())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

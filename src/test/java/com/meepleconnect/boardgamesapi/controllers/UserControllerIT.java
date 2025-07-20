@@ -18,6 +18,9 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+
+import org.springframework.security.test.context.support.WithMockUser;
 
 @SpringBootTest
 @AutoConfigureWebMvc
@@ -34,10 +37,14 @@ public class UserControllerIT {
 
         @BeforeEach
         void setUp() {
-                mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+                mockMvc = MockMvcBuilders
+                                .webAppContextSetup(webApplicationContext)
+                                .apply(springSecurity())
+                                .build();
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void getAllUsers_ShouldReturnUsersList() throws Exception {
                 mockMvc.perform(get("/api/users"))
                                 .andExpect(status().isOk())
@@ -46,6 +53,7 @@ public class UserControllerIT {
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void getAllUsers_ShouldReturnValidUserStructure() throws Exception {
                 mockMvc.perform(get("/api/users"))
                                 .andExpect(status().isOk())
@@ -55,6 +63,7 @@ public class UserControllerIT {
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void getUserById_WithValidId_ShouldReturnUser() throws Exception {
                 UserRequestDTO newUser = createTestUser("getuser", "password123");
                 String userJson = objectMapper.writeValueAsString(newUser);
@@ -76,12 +85,14 @@ public class UserControllerIT {
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void getUserById_WithInvalidId_ShouldReturnNotFound() throws Exception {
                 mockMvc.perform(get("/api/users/999"))
                                 .andExpect(status().isNotFound());
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void getUserById_WithNonNumericId_ShouldReturnBadRequest() throws Exception {
                 mockMvc.perform(get("/api/users/invalid"))
                                 .andExpect(status().isBadRequest());
@@ -164,6 +175,7 @@ public class UserControllerIT {
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void updateUser_WithValidUser_ShouldReturnUpdatedUser() throws Exception {
                 String uniqueUsername = "updateuser_" + System.currentTimeMillis();
                 UserRequestDTO newUser = createTestUser(uniqueUsername, "password123");
@@ -193,6 +205,7 @@ public class UserControllerIT {
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void updateUser_WithInvalidId_ShouldReturnNotFound() throws Exception {
                 UserRequestDTO updateUser = createTestUser("updateduser", "newpassword123");
                 String userJson = objectMapper.writeValueAsString(updateUser);
@@ -204,6 +217,7 @@ public class UserControllerIT {
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void updateUser_WithNonNumericId_ShouldReturnBadRequest() throws Exception {
                 UserRequestDTO updateUser = createTestUser("updateduser", "newpassword123");
                 String userJson = objectMapper.writeValueAsString(updateUser);
@@ -215,6 +229,7 @@ public class UserControllerIT {
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void updateUser_WithEmptyUserName_ShouldReturnBadRequest() throws Exception {
                 String uniqueUsername = "emptyupdate_" + System.currentTimeMillis();
                 UserRequestDTO newUser = createTestUser(uniqueUsername, "password123");
@@ -240,6 +255,7 @@ public class UserControllerIT {
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void updateUser_WithNullUserName_ShouldReturnBadRequest() throws Exception {
                 String uniqueUsername = "nullupdate_" + System.currentTimeMillis();
                 UserRequestDTO newUser = createTestUser(uniqueUsername, "password123");
@@ -267,6 +283,7 @@ public class UserControllerIT {
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void updateUser_WithInvalidJson_ShouldReturnServerError() throws Exception {
                 String uniqueUsername = "invalidjson_" + System.currentTimeMillis();
                 UserRequestDTO newUser = createTestUser(uniqueUsername, "password123");
@@ -291,6 +308,7 @@ public class UserControllerIT {
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void deleteUser_WithValidId_ShouldReturnNoContent() throws Exception {
                 String uniqueUsername = "deleteuser_" + System.currentTimeMillis();
                 UserRequestDTO newUser = createTestUser(uniqueUsername, "password123");
@@ -311,12 +329,14 @@ public class UserControllerIT {
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void deleteUser_WithInvalidId_ShouldReturnNoContent() throws Exception {
                 mockMvc.perform(delete("/api/users/999"))
                                 .andExpect(status().isNoContent());
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void deleteUser_WithNonNumericId_ShouldReturnBadRequest() throws Exception {
                 mockMvc.perform(delete("/api/users/invalid"))
                                 .andExpect(status().isBadRequest());

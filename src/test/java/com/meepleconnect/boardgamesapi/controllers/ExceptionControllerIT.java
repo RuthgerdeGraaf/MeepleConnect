@@ -422,4 +422,48 @@ public class ExceptionControllerIT {
                 assertThat(response.getBody().getMessage()).isEqualTo("Invalid credentials");
                 assertThat(response.getBody().getTimestamp()).isNotNull();
         }
+
+        @Test
+        void handleSQLException_WithDoesNotExistMessage_ShouldReturnServiceUnavailable() {
+                java.sql.SQLException ex = new java.sql.SQLException("Table does not exist");
+
+                ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController
+                                .handleSQLException(ex);
+
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+                assertThat(response.getBody()).isNotNull();
+                assertThat(response.getBody().getError()).isEqualTo("Service Unavailable");
+                assertThat(response.getBody().getMessage())
+                                .isEqualTo("Database schema issue - please contact administrator");
+                assertThat(response.getBody().getTimestamp()).isNotNull();
+        }
+
+        @Test
+        void handleSQLException_WithNullValueMessage_ShouldReturnBadRequest() {
+                java.sql.SQLException ex = new java.sql.SQLException(
+                                "null value in column violates not-null constraint");
+
+                ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController
+                                .handleSQLException(ex);
+
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+                assertThat(response.getBody()).isNotNull();
+                assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+                assertThat(response.getBody().getMessage()).isEqualTo("Invalid data - required fields cannot be empty");
+                assertThat(response.getBody().getTimestamp()).isNotNull();
+        }
+
+        @Test
+        void handleSQLException_WithGenericMessage_ShouldReturnInternalServerError() {
+                java.sql.SQLException ex = new java.sql.SQLException("Connection timeout");
+
+                ResponseEntity<ExceptionController.ErrorResponse> response = exceptionController
+                                .handleSQLException(ex);
+
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+                assertThat(response.getBody()).isNotNull();
+                assertThat(response.getBody().getError()).isEqualTo("Database Error");
+                assertThat(response.getBody().getMessage()).isEqualTo("Database operation failed");
+                assertThat(response.getBody().getTimestamp()).isNotNull();
+        }
 }
