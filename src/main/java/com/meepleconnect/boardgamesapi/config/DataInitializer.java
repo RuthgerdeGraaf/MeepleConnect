@@ -52,11 +52,14 @@ public class DataInitializer implements CommandLineRunner {
                 }
         }
 
-            @Transactional
-    private void initializeDefaultData() {
-        // Ensure we have the correct users - delete and recreate to avoid conflicts
-        userRepository.deleteAll();
-        System.out.println("🔄 Clearing existing users to ensure correct authentication data...");
+        @Transactional
+        private void initializeDefaultData() {
+                // Only initialize if no users exist yet
+                if (userRepository.count() > 0) {
+                        System.out.println("✅ Users already exist, skipping user initialization...");
+                        return;
+                }
+                System.out.println("🔄 Creating default users...");
 
                 Role adminRole = roleRepository.findAll().stream()
                                 .filter(r -> "ROLE_ADMIN".equals(r.getRoleName()))

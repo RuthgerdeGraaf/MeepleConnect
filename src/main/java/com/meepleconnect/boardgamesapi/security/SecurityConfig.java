@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .requestMatchers("/secure/admin").hasRole("ADMIN")
                         .requestMatchers("/secure/user").hasRole("USER")
                         .requestMatchers("/secure/**").authenticated()
-                        .requestMatchers("/api/files/upload").hasRole("EMPLOYEE")
+                        .requestMatchers("/api/files/upload").hasAnyRole("ADMIN", "EMPLOYEE")
 
                         .requestMatchers(HttpMethod.POST, "/api/boardgames/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/boardgames/**").hasRole("ADMIN")
