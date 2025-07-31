@@ -117,7 +117,6 @@ The API follows REST principles, implements proper security with JWT authenticat
 | 📊 **PostgreSQL**        | Relational database            | 13+         |
 | 🔀 **MapStruct**         | Object mapping (DTOs)          | Latest      |
 | ⚡ **Lombok**            | Reduces boilerplate code       | Latest      |
-| 📖 **Swagger (OpenAPI)** | API documentation              | 3.x         |
 | 🧪 **JUnit & Mockito**   | Unit and integration testing   | Latest      |
 | 🧱 **Maven**             | Dependency management          | Latest      |
 | 🔐 **JWT**               | Token-based authentication     | Latest      |
@@ -238,8 +237,6 @@ The application automatically creates these users on first startup:
 → Complete collection with 60+ endpoints ready for testing
 
 ### **API Documentation**
-
-🌐 **Swagger UI** → `http://localhost:8080/swagger-ui/index.html` (if enabled)
 
 ### **Health Checks**
 
