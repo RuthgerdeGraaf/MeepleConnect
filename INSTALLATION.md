@@ -308,5 +308,3 @@ The **complete Postman collection** contains all API endpoints:
 5. **Test Endpoints:** Start with `/api/health` and `/api/boardgames`
 
 **API Base URL:** `http://localhost:8080`
-
-**Swagger Documentation:** `http://localhost:8080/swagger-ui/index.html` (if enabled)
